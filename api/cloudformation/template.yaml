@@ -92,23 +92,6 @@ Resources:
         - AttributeName: user_id
           KeyType: RANGE
 
-  jaladAPI:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: !Sub API-${ProjectName}-${Env}
-      StageName: !Ref Env
-      Cors:
-        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
-      Auth:
-        Authorizers:
-          CognitoAuth:
-            UserPoolArn: !GetAtt BlogUserPool.Arn
-            Identity:
-              Header: Authorization
-
-  
   BlogUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -260,16 +243,31 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
   
-  CognitoAuth:
-    Type: AWS::ApiGateway::Authorizer
-    Properties:
-      Name: CognitoAuthorizer
-      RestApiId: !Ref jaladAPI
-      Type: COGNITO_USER_POOLS
-      IdentitySource: method.request.header.Authorization
-      ProviderARNs:
-        - !GetAtt BlogUserPool.Arn
+  # CognitoAuth:
+  #   Type: AWS::ApiGateway::Authorizer
+  #   Properties:
+  #     Name: CognitoAuthorizer
+  #     RestApiId: !Ref jaladAPI
+  #     Type: COGNITO_USER_POOLS
+  #     IdentitySource: method.request.header.Authorization
+  #     ProviderARNs:
+  #       - !GetAtt BlogUserPool.Arn
 
+  # jaladAPI:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     Name: !Sub API-${ProjectName}-${Env}
+  #     StageName: !Ref Env
+  #     Cors:
+  #       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+  #       AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+  #       AllowOrigin: "'*'"
+  #     Auth:
+  #       Authorizers:
+  #         CognitoAuth:
+  #           UserPoolArn: !GetAtt BlogUserPool.Arn
+  #           Identity:
+  #             Header: Authorization
 
   # ConfirmUserLambda:
   #   Type: AWS::Serverless::Function
@@ -429,7 +427,7 @@ Parameters:
     Description: The name of the project
     Default: jalad
 
-Outputs:
-  ApiBaseUrl:
-    Description: "Base URL for the API Gateway"
-    Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
+# Outputs:
+#   ApiBaseUrl:
+#     Description: "Base URL for the API Gateway"
+#     Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
