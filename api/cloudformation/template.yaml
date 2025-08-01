@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Configurations and resources for Portfolio Backend
+  Configurations and resources for Jalad Backend
 
 Globals:
   Function:
@@ -17,7 +17,7 @@ Resources:
   BlogsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Blogs-${Env}
+      TableName: !Sub Posts-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -52,7 +52,7 @@ Resources:
   CommentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Blogs-Comments-${Env}
+      TableName: !Sub Posts-Comments-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: post_id
@@ -79,7 +79,7 @@ Resources:
   ReactionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Blogs-Reactions-${Env}
+      TableName: !Sub Posts-Reactions-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: comment_id
@@ -92,10 +92,10 @@ Resources:
         - AttributeName: user_id
           KeyType: RANGE
 
-  PortfolioAPI:
+  jaladAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub PortfolioAPI-${Env}
+      Name: !Sub API-${Env}
       StageName: !Ref Env
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
@@ -121,7 +121,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /get-blogs
             Method: GET
       Environment:
@@ -141,7 +141,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /create-blog
             Method: POST
             Auth:
@@ -287,7 +287,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /confirm-user
             Method: POST
       Environment:
@@ -339,7 +339,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /download-resume
             Method: GET
 
@@ -347,7 +347,7 @@ Resources:
     Type: AWS::ApiGateway::Authorizer
     Properties:
       Name: CognitoAuthorizer
-      RestApiId: !Ref PortfolioAPI
+      RestApiId: !Ref jaladAPI
       Type: COGNITO_USER_POOLS
       IdentitySource: method.request.header.Authorization
       ProviderARNs:
@@ -366,7 +366,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /get-blog
             Method: GET
       Environment:
@@ -386,7 +386,7 @@ Resources:
         AddItem:
           Type: Api
           Properties:
-            RestApiId: !Ref PortfolioAPI
+            RestApiId: !Ref jaladAPI
             Path: /upload-to-s3
             Method: POST
       Environment:
@@ -421,8 +421,12 @@ Parameters:
   LinkedInClientSecret:
     Type: String
     Description: LinkedIn OAuth Client Secret
+  ProjectName:
+    Type: String
+    Description: The name of the project
+    Default: jalad
 
 Outputs:
   ApiBaseUrl:
     Description: "Base URL for the API Gateway"
-    Value: !Sub "https://${PortfolioAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
+    Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
