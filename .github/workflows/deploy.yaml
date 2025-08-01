@@ -42,10 +42,10 @@ jobs:
         working-directory: backend/lambda
         run: |
           pip install -r requirements.txt --target ./
-          zip -r ../../backend/cloudformation/portfolio.zip .
+          zip -r ../../api/cloudformation/portfolio.zip .
 
       - name: Upload Lambda ZIP to S3
-        working-directory: backend/cloudformation
+        working-directory: api/cloudformation
         run: |
           TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
           CODE_PATH="$ENV/$TIMESTAMP"
