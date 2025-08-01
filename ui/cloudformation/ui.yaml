@@ -25,7 +25,7 @@ Resources:
   jaladUIBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Sub "${ProjectName}-${BucketName}-${Env}"
+      BucketName: !Sub "${ProjectName}-${BucketName}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
