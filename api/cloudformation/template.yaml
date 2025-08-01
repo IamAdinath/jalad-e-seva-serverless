@@ -17,7 +17,7 @@ Resources:
   BlogsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Posts-${Env}
+      TableName: !Sub Posts-${ProjectName}-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -52,7 +52,7 @@ Resources:
   CommentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Posts-Comments-${Env}
+      TableName: !Sub Posts-Comments-${ProjectName}-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: post_id
@@ -79,7 +79,7 @@ Resources:
   ReactionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Posts-Reactions-${Env}
+      TableName: !Sub Posts-Reactions-${ProjectName}-${Env}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: comment_id
@@ -95,7 +95,7 @@ Resources:
   jaladAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub API-${Env}
+      Name: !Sub API-${ProjectName}-${Env}
       StageName: !Ref Env
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
@@ -111,7 +111,7 @@ Resources:
   GetBlogsLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub get-blogs-${Env}
+      FunctionName: !Sub get-blogs-${ProjectName}-${Env}
       Handler: blogs.get.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -132,7 +132,7 @@ Resources:
   CreateBlogsLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub create-blogs-${Env}
+      FunctionName: !Sub create-blogs-${ProjectName}-${Env}
       Handler: blogs.create.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -154,7 +154,7 @@ Resources:
   BlogUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub blog-user-pool-${Env}
+      UserPoolName: !Sub blog-user-pool-${ProjectName}-${Env}
       AutoVerifiedAttributes:
         - email
       AliasAttributes:
@@ -167,7 +167,7 @@ Resources:
   BlogUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: !Sub blog-user-client-${Env}
+      ClientName: !Sub blog-user-client-${ProjectName}-${Env}
       UserPoolId: !Ref BlogUserPool
       GenerateSecret: false
       AllowedOAuthFlowsUserPoolClient: true
@@ -215,7 +215,7 @@ Resources:
   BlogIdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      IdentityPoolName: !Sub blog-identity-pool-${Env}
+      IdentityPoolName: !Sub blog-identity-pool-${ProjectName}-${Env}
       AllowUnauthenticatedIdentities: false
       CognitoIdentityProviders:
         - ClientId: !Ref BlogUserPoolClient
@@ -231,7 +231,7 @@ Resources:
   CognitoAuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub blog-auth-role-${Env}
+      RoleName: !Sub blog-auth-role-${ProjectName}-${Env}
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -259,7 +259,7 @@ Resources:
   UsersTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub users-${Env}
+      TableName: !Sub users-${ProjectName}-${Env}
       AttributeDefinitions:
         - AttributeName: user_id
           AttributeType: S
@@ -271,13 +271,13 @@ Resources:
   BlogUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: !Sub blog-${Env}-auth
+      Domain: !Sub blog-${ProjectName}-${Env}-auth
       UserPoolId: !Ref BlogUserPool
 
   ConfirmUserLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub confirm-user-${Env}
+      FunctionName: !Sub confirm-user-${ProjectName}-${Env}
       Handler: users.confirm.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -298,7 +298,7 @@ Resources:
   MediaBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Sub mediabucket-${Env}
+      BucketName: !Sub mediabucket-${ProjectName}-${Env}
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
@@ -326,7 +326,7 @@ Resources:
   DownloadResumeLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub download-resume-${Env}
+      FunctionName: !Sub download-resume-${ProjectName}-${Env}
       Handler: resume.download.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -356,7 +356,7 @@ Resources:
   GetBlogByIdLambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub get-blog-by-id-${Env}
+      FunctionName: !Sub get-blog-by-id-${ProjectName}-${Env}
       Handler: blogs.getbyid.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -377,7 +377,7 @@ Resources:
   UploadToS3Lambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub upload-to-s3-${Env}
+      FunctionName: !Sub upload-to-s3-${ProjectName}-${Env}
       Handler: common.upload_to_s3.lambda_handler
       Policies:
         - AWSLambdaBasicExecutionRole
