@@ -1,0 +1,433 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Configurations and resources for Jalad Backend
+
+Globals:
+  Function:
+    Runtime: python3.12
+    MemorySize: 256
+    Timeout: 45
+    CodeUri:
+      Bucket: !Ref CodeBucket
+      Key: !Ref CodePath
+
+Resources:
+
+  BlogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub Posts-${ProjectName}-${Env}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: author
+          AttributeType: S
+        - AttributeName: published_at
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: author_index
+          KeySchema:
+            - AttributeName: author
+              KeyType: HASH
+            - AttributeName: published_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: status_published_at
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: published_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  CommentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub Posts-Comments-${ProjectName}-${Env}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: post_id
+          AttributeType: S
+        - AttributeName: comment_id
+          AttributeType: S
+        - AttributeName: parent_comment
+          AttributeType: S
+      KeySchema:
+        - AttributeName: post_id
+          KeyType: HASH
+        - AttributeName: comment_id
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: ParentCommentIndex
+          KeySchema:
+            - AttributeName: post_id
+              KeyType: HASH
+            - AttributeName: parent_comment
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  ReactionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub Posts-Reactions-${ProjectName}-${Env}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: comment_id
+          AttributeType: S
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: comment_id
+          KeyType: HASH
+        - AttributeName: user_id
+          KeyType: RANGE
+
+  BlogUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub blog-user-pool-${ProjectName}-${Env}
+      AutoVerifiedAttributes:
+        - email
+      AliasAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+
+  BlogUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub blog-user-client-${ProjectName}-${Env}
+      UserPoolId: !Ref BlogUserPool
+      GenerateSecret: false
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      CallbackURLs:
+        - http://localhost:3000/callback
+      LogoutURLs:
+        - http://localhost:3000/logout
+      SupportedIdentityProviders:
+        - COGNITO
+        # - Google
+
+  # BlogGoogleIdentityProvider:
+  #   Type: AWS::Cognito::UserPoolIdentityProvider
+  #   Properties:
+  #     ProviderName: Google
+  #     ProviderType: Google
+  #     UserPoolId: !Ref BlogUserPool
+  #     AttributeMapping:
+  #       email: email
+  #       username: sub
+  #     ProviderDetails:
+  #       client_id: !Ref GoogleClientId
+  #       authorize_scopes: email profile openid
+
+  BlogUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: user
+      Description: Regular blog readers and writers
+      UserPoolId: !Ref BlogUserPool
+
+  BlogAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admin
+      Description: Admins with elevated permissions
+      UserPoolId: !Ref BlogUserPool
+
+  BlogIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub blog-identity-pool-${ProjectName}-${Env}
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId: !Ref BlogUserPoolClient
+          ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${BlogUserPool}
+
+  BlogIdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref BlogIdentityPool
+      Roles:
+        authenticated: !GetAtt CognitoAuthenticatedRole.Arn
+
+  CognitoAuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub blog-auth-role-${ProjectName}-${Env}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref BlogIdentityPool
+              "ForAnyValue:StringLike":
+                cognito-identity.amazonaws.com:amr: authenticated
+      Policies:
+        - PolicyName: allowDynamoAndCognito
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: "*"
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub users-${ProjectName}-${Env}
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  BlogUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub blog-${ProjectName}-${Env}-auth
+      UserPoolId: !Ref BlogUserPool
+
+  MediaBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub mediabucket-${ProjectName}-${Env}
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            AllowedOrigins:
+              - "*"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  
+  # CognitoAuth:
+  #   Type: AWS::ApiGateway::Authorizer
+  #   Properties:
+  #     Name: CognitoAuthorizer
+  #     RestApiId: !Ref jaladAPI
+  #     Type: COGNITO_USER_POOLS
+  #     IdentitySource: method.request.header.Authorization
+  #     ProviderARNs:
+  #       - !GetAtt BlogUserPool.Arn
+
+  # jaladAPI:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     Name: !Sub API-${ProjectName}-${Env}
+  #     StageName: !Ref Env
+  #     Cors:
+  #       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+  #       AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+  #       AllowOrigin: "'*'"
+  #     Auth:
+  #       Authorizers:
+  #         CognitoAuth:
+  #           UserPoolArn: !GetAtt BlogUserPool.Arn
+  #           Identity:
+  #             Header: Authorization
+
+  # ConfirmUserLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub confirm-user-${ProjectName}-${Env}
+  #     Handler: users.confirm.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonDynamoDBFullAccess
+  #       - AmazonCognitoPowerUser
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /confirm-user
+  #           Method: POST
+  #     Environment:
+  #       Variables:
+  #         USERS_TABLE: !Ref UsersTable
+  #         USER_POOL_ID: !Ref BlogUserPool
+
+  # GetBlogsLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub get-blogs-${ProjectName}-${Env}
+  #     Handler: blogs.get.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonDynamoDBFullAccess
+  #       - AmazonS3FullAccess
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /get-blogs
+  #           Method: GET
+  #     Environment:
+  #       Variables:
+  #         BLOGS_TABLE: !Ref BlogsTable
+  #         MEDIA_BCUKET: !Ref MediaBucket
+
+  # CreateBlogsLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub create-blogs-${ProjectName}-${Env}
+  #     Handler: blogs.create.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonDynamoDBFullAccess
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /create-blog
+  #           Method: POST
+  #           Auth:
+  #             Authorizer: CognitoAuth
+  #     Environment:
+  #       Variables:
+  #         BLOGS_TABLE: !Ref BlogsTable
+  #         ENV : !Ref Env
+
+  
+  # DownloadResumeLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub download-resume-${ProjectName}-${Env}
+  #     Handler: resume.download.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonS3FullAccess
+  #     Environment:
+  #       Variables:
+  #         RESUME_BUCKET: !Ref MediaBucket
+  #         RESUME_KEY: resume/resume.pdf
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /download-resume
+  #           Method: GET
+
+  # GetBlogByIdLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub get-blog-by-id-${ProjectName}-${Env}
+  #     Handler: blogs.getbyid.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonDynamoDBFullAccess
+  #       - AmazonS3FullAccess
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /get-blog
+  #           Method: GET
+  #     Environment:
+  #       Variables:
+  #         BLOGS_TABLE: !Ref BlogsTable
+  #         MEDIA_BCUKET: !Ref MediaBucket
+
+  # UploadToS3Lambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub upload-to-s3-${ProjectName}-${Env}
+  #     Handler: common.upload_to_s3.lambda_handler
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - AmazonS3FullAccess
+  #     Events:
+  #       AddItem:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref jaladAPI
+  #           Path: /upload-to-s3
+  #           Method: POST
+  #     Environment:
+  #       Variables:
+  #         MEDIA_BUCKET: !Ref MediaBucket
+  #         ENV : !Ref Env
+
+Parameters:
+  Env:
+    Default: dev
+    Description: The name of this environment. Will be used to name resources
+    Type: String
+  CodeBucket:
+    Description: The S3 Bucket of lambda code uploaded to
+    Type: String
+  CodePath:
+    Description: The S3 path to the lambda zip file
+    Type: String
+  PythonRuntime:
+    Description: The Python version to use for lambda functions
+    Type: String
+    Default: python3.12
+  GoogleClientId:
+    Type: String
+    Description: Google OAuth Client ID
+  GoogleClientSecret:
+    Type: String
+    Description: Google OAuth Client Secret
+  LinkedInClientId:
+    Type: String
+    Description: LinkedIn OAuth Client ID
+  LinkedInClientSecret:
+    Type: String
+    Description: LinkedIn OAuth Client Secret
+  ProjectName:
+    Type: String
+    Description: The name of the project
+    Default: jalad
+
+# Outputs:
+#   ApiBaseUrl:
+#     Description: "Base URL for the API Gateway"
+#     Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
