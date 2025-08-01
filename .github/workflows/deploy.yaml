@@ -101,7 +101,7 @@ jobs:
       REGION: ${{ vars.DEV_UI_REGION }}
       CODE_BUCKET: ${{ vars.DEV_UI_BUCKET_NAME }}
       STACK_NAME: ${{ vars.DEV_UI_STACK_NAME }}
-      REACT_APP_API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
+      # REACT_APP_API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
       # Add other REACT_ envs as needed...
 
