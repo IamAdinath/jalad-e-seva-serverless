@@ -39,7 +39,7 @@ jobs:
           aws-region: ${{ env.REGION }}
 
       - name: Package Lambda
-        working-directory: backend/lambda
+        working-directory: api/lambda
         run: |
           pip install -r requirements.txt --target ./
           zip -r ../../api/cloudformation/portfolio.zip .
@@ -53,7 +53,7 @@ jobs:
           aws s3 cp portfolio.zip s3://$CODE_BUCKET/$CODE_PATH/portfolio.zip
 
       - name: Deploy Lambda via CloudFormation
-        working-directory: backend/cloudformation
+        working-directory: api/cloudformation
         run: |
           aws cloudformation deploy \
             --template-file template.yaml \
