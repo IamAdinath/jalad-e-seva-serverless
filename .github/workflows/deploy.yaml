@@ -2,7 +2,7 @@ name: Deploy Jalad e Seva
 
 on:
   push:
-    branches: [dev, master, ui-deployment-setup]
+    branches: [dev, master, feature/ui-deployment-setup]
   workflow_dispatch:
 
 jobs:
