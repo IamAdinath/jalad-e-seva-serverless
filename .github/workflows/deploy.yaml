@@ -141,7 +141,8 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               Env=$ENV \
-              CodeBucket=$CODE_BUCKET
+              BucketName=$CODE_BUCKET \
+              ProjectName=$PROJECT_NAME
 
       # Step 3 - Build and Sync UI
       - name: Build and Sync UI to S3
