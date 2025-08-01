@@ -129,7 +129,7 @@ jobs:
 
       - name: Sync to S3
         run: |
-          aws s3 sync ui/build s3://$CODE_BUCKET/ --delete
+          aws s3 sync ui/dist s3://$CODE_BUCKET/ --delete
 
 # --------------------------
 # PROD DEPLOYMENT
