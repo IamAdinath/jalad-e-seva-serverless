@@ -80,7 +80,12 @@ jobs:
               Env=$ENV \
               CodeBucket=$CODE_BUCKET \
               CodePath="$CODE_PATH/portfolio.zip" \
-              PythonRuntime=$DEFAULT_PYTHON_RUNTIME
+              PythonRuntime=$DEFAULT_PYTHON_RUNTIME \
+              LinkedInClientId="" \
+              GoogleClientId="" \
+              GoogleClientSecret="" \
+              LinkedInClientSecret=""
+
 
   deploy-ui-dev:
     if: github.ref_name == 'dev'
