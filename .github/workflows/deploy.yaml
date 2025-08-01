@@ -6,19 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  # --------------------
-  # API / Lambda Deployment
-  # --------------------
-  deploy-api:
-    name: Deploy API (Lambda)
+  # --------------------------
+  # DEV DEPLOYMENT
+  # --------------------------
+  deploy-api-dev:
+    if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
+    name: Deploy API - Dev
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    environment: dev
 
     env:
-      ENV: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      REGION: ${{ vars.$ENV_API_AWS_REGION }}
-      CODE_BUCKET: ${{ vars.$ENV_API_BUCKET_NAME }}
-      STACK_NAME: ${{ vars.$ENV_API_AWS_REGION }}
+      ENV: dev
+      REGION: ${{ vars.DEV_API_AWS_REGION }}
+      CODE_BUCKET: ${{ vars.DEV_API_BUCKET_NAME }}
+      STACK_NAME: ${{ vars.DEV_API_STACK_NAME }}
       DEFAULT_PYTHON_RUNTIME: "python3.12"
 
     steps:
@@ -33,31 +34,25 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.$ENV_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.$ENV_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.REGION }}
 
-      - name: Package Lambda function
+      - name: Package Lambda
         working-directory: backend/lambda
         run: |
           pip install -r requirements.txt --target ./
-          zip -r ../../api/cloudformation/portfolio.zip .
+          zip -r ../../backend/cloudformation/portfolio.zip .
 
-      - name: Ensure S3 bucket exists
-        run: |
-          if ! aws s3api head-bucket --bucket "$CODE_BUCKET" --region "$REGION" 2>/dev/null; then
-            aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
-          fi
-
-      - name: Upload Lambda zip to S3
+      - name: Upload Lambda ZIP to S3
         working-directory: backend/cloudformation
         run: |
-          NOW=$(date "+%Y%m%d_%H%M%S")
-          CODE_PATH="$ENV/$NOW"
+          TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
+          CODE_PATH="$ENV/$TIMESTAMP"
           echo "CODE_PATH=$CODE_PATH" >> $GITHUB_ENV
           aws s3 cp portfolio.zip s3://$CODE_BUCKET/$CODE_PATH/portfolio.zip
 
-      - name: Deploy Lambda stack
+      - name: Deploy Lambda via CloudFormation
         working-directory: backend/cloudformation
         run: |
           aws cloudformation deploy \
@@ -73,28 +68,20 @@ jobs:
               CodePath="$CODE_PATH/portfolio.zip" \
               PythonRuntime=$DEFAULT_PYTHON_RUNTIME
 
-  # --------------------
-  # UI Deployment (React)
-  # --------------------
-  deploy-ui:
-    name: Deploy Frontend (React)
+  deploy-ui-dev:
+    if: github.ref_name == 'dev'
+    name: Deploy UI - Dev
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-    needs: deploy-api
+    environment: dev
+    needs: deploy-api-dev
 
     env:
-      REGION: ${{ vars.UI_REGION }}
-      CODE_BUCKET: ${{ vars.UI_BUCKET_NAME }}
-      STACK_NAME: ${{ vars.UI_STACK_NAME }}
-      ENV: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      REACT_APP_API_BASE_URL: ${{ vars.REACT_APP_API_BASE_URL }}
-      REACT_APP_COGNITO_USER_POOL_ID: ${{ vars.REACT_APP_COGNITO_USER_POOL_ID }}
-      REACT_APP_COGNITO_CLIENT_ID: ${{ vars.REACT_APP_COGNITO_CLIENT_ID }}
-      REACT_APP_COGNITO_REGION: ${{ vars.REACT_APP_COGNITO_REGION }}
-      REACT_APP_COGNITO_DOMAIN: ${{ vars.REACT_APP_COGNITO_DOMAIN }}
-      REACT_APP_COGNITO_REDIRECT_SIGNIN: ${{ vars.REACT_APP_COGNITO_REDIRECT_SIGNIN }}
-      REACT_APP_COGNITO_REDIRECT_SIGNOUT: ${{ vars.REACT_APP_COGNITO_REDIRECT_SIGNOUT }}
-      REACT_APP_API_KEY: ${{ vars.REACT_APP_API_KEY }}
+      ENV: dev
+      REGION: ${{ vars.DEV_UI_REGION }}
+      CODE_BUCKET: ${{ vars.DEV_UI_BUCKET_NAME }}
+      STACK_NAME: ${{ vars.DEV_UI_STACK_NAME }}
+      REACT_APP_API_BASE_URL: ${{ vars.DEV_API_BASE_URL }}
+      # Add other REACT_ envs as needed...
 
     steps:
       - name: Checkout code
@@ -103,13 +90,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.REGION }}
 
       - name: Build React App
@@ -118,19 +105,47 @@ jobs:
           npm install
           npm run build
 
-      - name: Upload to S3
+      - name: Sync to S3
         run: |
           aws s3 sync frontend/build s3://$CODE_BUCKET/ --delete
 
-      - name: Deploy UI CloudFormation (if needed)
-        working-directory: frontend/cloudformation
-        run: |
-          aws cloudformation deploy \
-            --template-file template.yaml \
-            --stack-name $STACK_NAME \
-            --region $REGION \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --no-fail-on-empty-changeset \
-            --parameter-overrides \
-              Env=$ENV \
-              CodeBucket=$CODE_BUCKET
+# --------------------------
+# PROD DEPLOYMENT
+# --------------------------
+  deploy-api-prod:
+    if: github.ref_name == 'master'
+    name: Deploy API - Prod
+    runs-on: ubuntu-latest
+    environment: prod
+
+    env:
+      ENV: prod
+      REGION: ${{ vars.PROD_API_AWS_REGION }}
+      CODE_BUCKET: ${{ vars.PROD_API_BUCKET_NAME }}
+      STACK_NAME: ${{ vars.PROD_API_STACK_NAME }}
+      DEFAULT_PYTHON_RUNTIME: "python3.12"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # ... repeat same steps as dev but use PROD secrets/vars
+
+  deploy-ui-prod:
+    if: github.ref_name == 'master'
+    name: Deploy UI - Prod
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: deploy-api-prod
+
+    env:
+      ENV: prod
+      REGION: ${{ vars.PROD_UI_REGION }}
+      CODE_BUCKET: ${{ vars.PROD_UI_BUCKET_NAME }}
+      STACK_NAME: ${{ vars.PROD_UI_STACK_NAME }}
+      REACT_APP_API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
+      # other REACT_ envs...
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # ... same steps as UI-dev but for prod
