@@ -16,9 +16,9 @@ jobs:
 
     env:
       ENV: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
-      REGION: ${{ vars.$ENV_API_REGION }}
+      REGION: ${{ vars.$ENV_API_AWS_REGION }}
       CODE_BUCKET: ${{ vars.$ENV_API_BUCKET_NAME }}
-      STACK_NAME: ${{ vars.$ENV_API_STACK_NAME }}
+      STACK_NAME: ${{ vars.$ENV_API_AWS_REGION }}
       DEFAULT_PYTHON_RUNTIME: "python3.12"
 
     steps:
