@@ -38,6 +38,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.REGION }}
 
+      - name: Ensure S3 Bucket exists
+        run: |
+          if ! aws s3api head-bucket --bucket "$CODE_BUCKET" 2>/dev/null; then
+            echo "Bucket $CODE_BUCKET does not exist. Creating..."
+            if [ "$REGION" = "us-east-1" ]; then
+              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION"
+            else
+              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION" \
+                --create-bucket-configuration LocationConstraint="$REGION"
+            fi
+          else
+            echo "Bucket $CODE_BUCKET already exists."
+          fi
+
       - name: Package Lambda
         working-directory: api/lambda
         run: |
