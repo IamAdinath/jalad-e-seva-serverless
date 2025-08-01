@@ -61,47 +61,47 @@ Resources:
         SigningBehavior: "always"
         OriginAccessControlOriginType: "s3"
 
-  # ReactAppCDN:
-  #   Type: "AWS::CloudFront::Distribution"
-  #   Properties:
-  #     DistributionConfig:
-  #       Enabled: true
-  #       DefaultRootObject: "index.html"
-  #       Origins:
-  #         - CustomOriginConfig:
-  #             OriginProtocolPolicy: "http-only"
-  #           DomainName: !Join ["", [!Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com"]]
-  #           Id: !Join ["", ["Custom-", !Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com/"]]
-  #       DefaultCacheBehavior:
-  #         ForwardedValues:
-  #           QueryString: false
-  #           Cookies: {Forward: "none"}
-  #           Headers: ["Origin"]
-  #         TargetOriginId: !Join ["", ["Custom-", !Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com/"]]
-  #         ViewerProtocolPolicy: "redirect-to-https"
-  #       ViewerCertificate:
-  #         CloudFrontDefaultCertificate: true
-  #       CustomErrorResponses:
-  #         - ErrorCode: 403
-  #           ResponsePagePath: "/index.html"
-  #           ResponseCode: 200
-  #           ErrorCachingMinTTL: 0
-  #         - ErrorCode: 404
-  #           ResponsePagePath: "/index.html"
-  #           ResponseCode: 200
-  #           ErrorCachingMinTTL: 0
-  #       PriceClass: "PriceClass_200"
-  #       HttpVersion: "http2"
+  ReactAppCDN:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: "index.html"
+        Origins:
+          - CustomOriginConfig:
+              OriginProtocolPolicy: "http-only"
+            DomainName: !Join ["", [!Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com"]]
+            Id: !Join ["", ["Custom-", !Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com/"]]
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: false
+            Cookies: {Forward: "none"}
+            Headers: ["Origin"]
+          TargetOriginId: !Join ["", ["Custom-", !Ref "jaladUIBucket", ".s3-website-", !Ref "AWS::Region", ".amazonaws.com/"]]
+          ViewerProtocolPolicy: "redirect-to-https"
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponsePagePath: "/index.html"
+            ResponseCode: 200
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponsePagePath: "/index.html"
+            ResponseCode: 200
+            ErrorCachingMinTTL: 0
+        PriceClass: "PriceClass_200"
+        HttpVersion: "http2"
 
 Outputs:
   S3BucketName:
     Description: "S3 bucket name for the React app"
     Value: !Ref jaladUIBucket
 
-  # CloudFrontURL:
-  #   Description: "CloudFront distribution URL"
-  #   Value: !Sub "https://${ReactAppCDN.DomainName}"
+  CloudFrontURL:
+    Description: "CloudFront distribution URL"
+    Value: !Sub "https://${ReactAppCDN.DomainName}"
 
-  # CloudFrontDistributionID:
-  #   Description: "CloudFront Distribution ID"
-  #   Value: !Ref ReactAppCDN
+  CloudFrontDistributionID:
+    Description: "CloudFront Distribution ID"
+    Value: !Ref ReactAppCDN
