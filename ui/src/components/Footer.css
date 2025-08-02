@@ -1,0 +1,146 @@
+/*
+  Footer.css
+  Updated with a vibrant, theme-matching background.
+*/
+
+:root {
+  --primary-color: #00796b;      /* Deep Teal */
+  --secondary-color: #ffc107;   /* Amber/Gold */
+  /* New variable for the dark end of our gradient */
+  --footer-bg-dark: #1c2529;
+  /* New variable for high-contrast text on the dark gradient */
+  --footer-text-light: #ced4da;
+  --footer-heading: #ffffff;
+}
+
+.site-footer {
+  /*
+    THE NEW BACKGROUND:
+    A rich gradient from our primary teal to a deep, cool gray.
+    This is visually interesting and feels premium.
+  */
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--footer-bg-dark) 100%);
+  color: var(--footer-text-light); /* Use the new high-contrast text color */
+  padding: 80px 0 20px 0;
+  font-size: 0.95rem;
+}
+
+.footer-grid {
+  display: grid;
+  gap: 40px;
+  margin-bottom: 40px;
+  grid-template-columns: 1fr; /* Mobile-first: 1 column */
+}
+
+
+/* --- Content Styling (Adjusted for the new background) --- */
+
+.footer-about .footer-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.footer-about .logo-img {
+  height: 35px;
+  margin-right: 10px;
+}
+
+/* Make the logo text pure white for maximum pop */
+.footer-about .logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--footer-heading);
+}
+
+.footer-about p {
+  line-height: 1.7;
+  /* Slightly reduce opacity to make headings stand out more */
+  opacity: 0.9;
+}
+
+.footer-links h4, .footer-contact h4 {
+  font-size: 1.1rem;
+  color: var(--footer-heading);
+  margin-bottom: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px; /* Adds a touch of class */
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  color: var(--footer-text-light);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* On hover, use the vibrant secondary color for a beautiful contrast */
+.footer-links a:hover {
+  color: var(--secondary-color);
+  padding-left: 5px;
+}
+
+
+/* --- Social Icons --- */
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icons a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  /* A semi-transparent background looks great on a gradient */
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--footer-heading);
+  text-decoration: none;
+  border-radius: 50%;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Use the secondary color for the social icon hover state */
+.social-icons a:hover {
+  background-color: var(--secondary-color);
+  color: var(--footer-bg-dark); /* Dark text on the gold background */
+  transform: translateY(-3px);
+  border-color: var(--secondary-color);
+}
+
+
+/* --- Footer Bottom (Copyright) --- */
+.footer-bottom {
+  /* A subtle border using transparency */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 30px;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+
+/* --- Responsive Grid Layout (No changes needed here) --- */
+@media (min-width: 576px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
