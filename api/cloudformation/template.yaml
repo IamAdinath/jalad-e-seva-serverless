@@ -427,7 +427,13 @@ Parameters:
     Description: The name of the project
     Default: jalad
 
-# Outputs:
-#   ApiBaseUrl:
-#     Description: "Base URL for the API Gateway"
-#     Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
+Outputs:
+  ApiBaseUrl:
+    Description: "Base URL for the API Gateway"
+    Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref BlogUserPool
+  CognitoIdentityPoolId:
+    Description: "Cognito Identity Pool ID"
+    Value: !Ref BlogIdentityPool
