@@ -5,89 +5,103 @@ on:
     branches: [dev, master]
   workflow_dispatch:
 
-jobs:
+# jobs:
   # --------------------------
   # DEV DEPLOYMENT
   # --------------------------
+  # deploy-api-dev:
+  #   if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
+  #   name: Deploy API - Dev
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+
+  #   env:
+  #     ENV: dev
+  #     REGION: ${{ vars.DEV_API_AWS_REGION }}
+  #     CODE_BUCKET: ${{ vars.DEV_API_BUCKET_NAME }}
+  #     STACK_NAME: ${{ vars.DEV_API_STACK_NAME }}
+  #     DEFAULT_PYTHON_RUNTIME: "python3.12"
+  #     PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.12'
+
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ env.REGION }}
+
+  #     - name: Ensure S3 Bucket exists
+  #       run: |
+  #         if ! aws s3api head-bucket --bucket "$CODE_BUCKET" 2>/dev/null; then
+  #           echo "Bucket $CODE_BUCKET does not exist. Creating..."
+  #           if [ "$REGION" = "us-east-1" ]; then
+  #             aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION"
+  #           else
+  #             aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION" \
+  #               --create-bucket-configuration LocationConstraint="$REGION"
+  #           fi
+  #         else
+  #           echo "Bucket $CODE_BUCKET already exists."
+  #         fi
+
+  #     - name: Package Lambda
+  #       working-directory: api/lambda
+  #       run: |
+  #         pip install -r requirements.txt --target ./
+  #         zip -r ../../api/cloudformation/$PROJECT_NAME.zip .
+
+  #     - name: Upload Lambda ZIP to S3
+  #       working-directory: api/cloudformation
+  #       run: |
+  #         TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
+  #         CODE_PATH="$ENV/$TIMESTAMP"
+  #         echo "CODE_PATH=$CODE_PATH" >> $GITHUB_ENV
+  #         aws s3 cp $PROJECT_NAME.zip s3://$CODE_BUCKET/$CODE_PATH/$PROJECT_NAME.zip
+
+  #     - name: Deploy Lambda via CloudFormation
+  #       working-directory: api/cloudformation
+  #       run: |
+  #         aws cloudformation deploy \
+  #           --template-file template.yaml \
+  #           --s3-bucket $CODE_BUCKET \
+  #           --s3-prefix $CODE_PATH \
+  #           --stack-name $STACK_NAME \
+  #           --capabilities CAPABILITY_NAMED_IAM \
+  #           --no-fail-on-empty-changeset \
+  #           --parameter-overrides \
+  #             Env=$ENV \
+  #             CodeBucket=$CODE_BUCKET \
+  #             CodePath="$CODE_PATH/$PROJECT_NAME.zip" \
+  #             PythonRuntime=$DEFAULT_PYTHON_RUNTIME \
+  #             LinkedInClientId="" \
+  #             GoogleClientId="" \
+  #             GoogleClientSecret="" \
+  #             LinkedInClientSecret="" \
+  #             ProjectName=$PROJECT_NAME
+
+jobs:
   deploy-api-dev:
     if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
-    name: Deploy API - Dev
-    runs-on: ubuntu-latest
-    environment: dev
-
-    env:
+    uses: ./.github/workflows/deploy-api.yml
+    with:
       ENV: dev
       REGION: ${{ vars.DEV_API_AWS_REGION }}
       CODE_BUCKET: ${{ vars.DEV_API_BUCKET_NAME }}
       STACK_NAME: ${{ vars.DEV_API_STACK_NAME }}
-      DEFAULT_PYTHON_RUNTIME: "python3.12"
+      LAMBDA_FUNCTION_NAME: ${{ vars.DEV_API_LAMBDA_FUNCTION_NAME }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.REGION }}
-
-      - name: Ensure S3 Bucket exists
-        run: |
-          if ! aws s3api head-bucket --bucket "$CODE_BUCKET" 2>/dev/null; then
-            echo "Bucket $CODE_BUCKET does not exist. Creating..."
-            if [ "$REGION" = "us-east-1" ]; then
-              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION"
-            else
-              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION" \
-                --create-bucket-configuration LocationConstraint="$REGION"
-            fi
-          else
-            echo "Bucket $CODE_BUCKET already exists."
-          fi
-
-      - name: Package Lambda
-        working-directory: api/lambda
-        run: |
-          pip install -r requirements.txt --target ./
-          zip -r ../../api/cloudformation/$PROJECT_NAME.zip .
-
-      - name: Upload Lambda ZIP to S3
-        working-directory: api/cloudformation
-        run: |
-          TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
-          CODE_PATH="$ENV/$TIMESTAMP"
-          echo "CODE_PATH=$CODE_PATH" >> $GITHUB_ENV
-          aws s3 cp $PROJECT_NAME.zip s3://$CODE_BUCKET/$CODE_PATH/$PROJECT_NAME.zip
-
-      - name: Deploy Lambda via CloudFormation
-        working-directory: api/cloudformation
-        run: |
-          aws cloudformation deploy \
-            --template-file template.yaml \
-            --s3-bucket $CODE_BUCKET \
-            --s3-prefix $CODE_PATH \
-            --stack-name $STACK_NAME \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --no-fail-on-empty-changeset \
-            --parameter-overrides \
-              Env=$ENV \
-              CodeBucket=$CODE_BUCKET \
-              CodePath="$CODE_PATH/$PROJECT_NAME.zip" \
-              PythonRuntime=$DEFAULT_PYTHON_RUNTIME \
-              LinkedInClientId="" \
-              GoogleClientId="" \
-              GoogleClientSecret="" \
-              LinkedInClientSecret="" \
-              ProjectName=$PROJECT_NAME
-
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
 
   deploy-ui-dev:
     if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
