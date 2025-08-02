@@ -1,4 +1,4 @@
-name: API Deployment Workflow for Jalad e Seva
+name: Reusable API Deployment
 
 on:
   workflow_call:
@@ -28,9 +28,10 @@ on:
         default: "python3.12"
         type: string
       PROJECT_NAME:
-        description: "Project name"
+        description: "Project name for parameter overrides"
         required: true
         type: string
+        default: "jalad"
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -42,19 +43,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV }}
 
-  deploy-api-dev:
-    if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
-    name: Deploy API - Dev
-    runs-on: ubuntu-latest
-    environment: dev
-
     env:
-      ENV: dev
-      REGION: ${{ vars.DEV_API_AWS_REGION }}
-      CODE_BUCKET: ${{ vars.DEV_API_BUCKET_NAME }}
-      STACK_NAME: ${{ vars.DEV_API_STACK_NAME }}
-      DEFAULT_PYTHON_RUNTIME: "python3.12"
-      PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+      ENV: ${{ inputs.ENV }}
+      REGION: ${{ inputs.REGION }}
+      CODE_BUCKET: ${{ inputs.CODE_BUCKET }}
+      STACK_NAME: ${{ inputs.STACK_NAME }}
+      LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
+      DEFAULT_PYTHON_RUNTIME: ${{ inputs.DEFAULT_PYTHON_RUNTIME }}
+      PROJECT_NAME: ${{ inputs.PROJECT_NAME }}
 
     steps:
       - name: Checkout code
@@ -63,19 +59,27 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.DEFAULT_PYTHON_RUNTIME }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.REGION }}
 
-      - name: Ensure S3 Bucket exists
+      # Step 1: Package Lambda code
+      - name: Package Lambda
+        working-directory: api/lambda
+        run: |
+          pip install -r requirements.txt --target ./
+          zip -r ../../api/cloudformation/portfolio.zip .
+
+      # Step 2: Ensure S3 bucket exists
+      - name: Ensure S3 bucket exists
         run: |
           if ! aws s3api head-bucket --bucket "$CODE_BUCKET" 2>/dev/null; then
-            echo "Bucket $CODE_BUCKET does not exist. Creating..."
+            echo "Creating S3 bucket $CODE_BUCKET..."
             if [ "$REGION" = "us-east-1" ]; then
               aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION"
             else
@@ -86,21 +90,28 @@ jobs:
             echo "Bucket $CODE_BUCKET already exists."
           fi
 
-      - name: Package Lambda
-        working-directory: api/lambda
-        run: |
-          pip install -r requirements.txt --target ./
-          zip -r ../../api/cloudformation/$PROJECT_NAME.zip .
-
+      # Step 3: Upload Lambda ZIP to S3
       - name: Upload Lambda ZIP to S3
         working-directory: api/cloudformation
         run: |
           TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
           CODE_PATH="$ENV/$TIMESTAMP"
           echo "CODE_PATH=$CODE_PATH" >> $GITHUB_ENV
-          aws s3 cp $PROJECT_NAME.zip s3://$CODE_BUCKET/$CODE_PATH/$PROJECT_NAME.zip
+          aws s3 cp portfolio.zip s3://$CODE_BUCKET/$CODE_PATH/portfolio.zip
 
-      - name: Deploy Lambda via CloudFormation
+      # Step 4: Check if CloudFormation stack exists
+      - name: Check if CloudFormation stack exists
+        id: check_stack
+        run: |
+          if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 5: Deploy stack (first time)
+      - name: Deploy stack (first time)
+        if: steps.check_stack.outputs.exists == 'false'
         working-directory: api/cloudformation
         run: |
           aws cloudformation deploy \
@@ -109,14 +120,57 @@ jobs:
             --s3-prefix $CODE_PATH \
             --stack-name $STACK_NAME \
             --capabilities CAPABILITY_NAMED_IAM \
-            --no-fail-on-empty-changeset \
             --parameter-overrides \
               Env=$ENV \
               CodeBucket=$CODE_BUCKET \
-              CodePath="$CODE_PATH/$PROJECT_NAME.zip" \
+              CodePath="$CODE_PATH/portfolio.zip" \
               PythonRuntime=$DEFAULT_PYTHON_RUNTIME \
               LinkedInClientId="" \
               GoogleClientId="" \
               GoogleClientSecret="" \
               LinkedInClientSecret="" \
               ProjectName=$PROJECT_NAME
+              
+
+      # Step 6: Compare templates if stack exists
+      - name: Compare templates
+        if: steps.check_stack.outputs.exists == 'true'
+        id: compare_templates
+        working-directory: api/cloudformation
+        run: |
+          aws cloudformation get-template \
+            --stack-name $STACK_NAME \
+            --query 'TemplateBody' \
+            --output text > deployed-template.yaml || touch deployed-template.yaml
+
+          if ! diff -q deployed-template.yaml template.yaml >/dev/null 2>&1; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 7: Deploy updated stack if template changed
+      - name: Deploy updated stack
+        if: steps.compare_templates.outputs.changed == 'true'
+        working-directory: api/cloudformation
+        run: |
+          aws cloudformation deploy \
+            --template-file template.yaml \
+            --s3-bucket $CODE_BUCKET \
+            --s3-prefix $CODE_PATH \
+            --stack-name $STACK_NAME \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              Env=$ENV \
+              CodeBucket=$CODE_BUCKET \
+              CodePath="$CODE_PATH/portfolio.zip" \
+              PythonRuntime=$DEFAULT_PYTHON_RUNTIME
+
+      # Step 8: Update Lambda code only if template unchanged
+      - name: Update Lambda function code only
+        if: steps.compare_templates.outputs.changed == 'false'
+        run: |
+          aws lambda update-function-code \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --s3-bucket $CODE_BUCKET \
+            --s3-key "$CODE_PATH/portfolio.zip"
