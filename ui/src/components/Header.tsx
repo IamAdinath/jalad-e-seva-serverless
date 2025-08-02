@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../assets/images/logoindia.png';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next'; 
 
 // This line is CRITICAL. It imports the CSS file.
 import './Header.css';
 
 const Header: React.FC = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
 
@@ -36,10 +39,16 @@ const Header: React.FC = () => {
           {/* NAVIGATION LINKS */}
           {/* The class will be "nav-links" or "nav-links active" */}
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
-            <li><a href="/">Home</a></li>
-            <li><a href="/schemes">Schemes</a></li>
-            <li><a href="/jobs">Jobs</a></li>
-            <li><a href="/students">Students</a></li>
+            <li><a href="/">{t('navHome')}</a></li>
+            <li><a href="/schemes">{t('navSchemes')}</a></li>
+            <li><a href="/jobs">{t('navJobs')}</a></li>
+            <li><a href="/students">{t('navStudents')}</a></li>
+            <li className="nav-cta"><a href="/signup">{t('navSignUp')}</a></li>
+            
+            {/* ADD THE LANGUAGE SWITCHER HERE */}
+            <li className="nav-translate">
+              <LanguageSwitcher />
+            </li>
           </ul>
 
           {/* HAMBURGER MENU BUTTON */}
