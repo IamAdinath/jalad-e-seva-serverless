@@ -2,21 +2,22 @@ import React from 'react';
 
 // Import the dedicated CSS file for this banner
 import './Banner.css';
+import { useTranslation } from 'react-i18next';
 
 const Banner: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <section className="hero-banner">
       <div className="container">
         <div className="banner-content">
           <h1 className="hero-title">
-            Empowering Your Journey with e-Seva
+            {t('heroTitle')}
           </h1>
           <p className="hero-subtitle">
-            All government schemes, jobs, and services at your fingertips.
-            Simple, fast, and reliable.
+            {t('heroSubtitle')}
           </p>
           <a href="/schemes" className="cta-button">
-            Explore Services
+            {t('heroCTA')}
           </a>
         </div>
       </div>
