@@ -113,9 +113,53 @@ jobs:
       CODE_BUCKET: ${{ vars.PROD_UI_BUCKET_NAME }}
       STACK_NAME: ${{ vars.PROD_UI_STACK_NAME }}
       REACT_APP_API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
-      # other REACT_ envs...
+      PROJECT_NAME: ${{ vars.PROJECT_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      # ... same steps as UI-dev but for prod
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
+      # Step 1 - Check if stack exists
+      - name: Check if CloudFormation stack exists
+        id: check_stack
+        run: |
+          if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 2 - Deploy stack (only if it does not exist)
+      - name: Deploy UI CloudFormation stack
+        if: steps.check_stack.outputs.exists == 'false'
+        working-directory: ui/cloudformation
+        run: |
+          aws cloudformation deploy \
+            --template-file ui.yaml \
+            --stack-name $STACK_NAME \
+            --region $REGION \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              Env=$ENV \
+              BucketName=$CODE_BUCKET \
+              ProjectName=$PROJECT_NAME
+
+      # Step 3 - Build and Sync UI
+      - name: Build and Sync UI to S3
+        working-directory: ui
+        run: |
+          npm install
+          npm run build
+          aws s3 sync dist s3://$CODE_BUCKET --delete
