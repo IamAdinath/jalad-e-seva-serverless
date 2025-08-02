@@ -88,8 +88,6 @@ jobs:
 # --------------------------
   deploy-api-prod:
     if: github.ref_name == 'master'
-    name: Deploy API - Prod
-    runs-on: ubuntu-latest
     uses: ./.github/workflows/deploy-api.yaml
     with:
       ENV: prod
