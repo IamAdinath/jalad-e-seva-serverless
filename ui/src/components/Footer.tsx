@@ -2,11 +2,13 @@ import React from 'react';
 
 // Import the dedicated CSS file for the footer
 import './Footer.css';
+import { useTranslation } from 'react-i18next';
 
 // You can use your own logo or import it if you have a separate dark-mode version
 import logo from '../assets/images/logoindia.png';
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   // Automatically gets the current year for the copyright notice
   const currentYear = new Date().getFullYear();
 
@@ -22,34 +24,33 @@ const Footer: React.FC = () => {
               <span className="logo-text">e-Seva</span>
             </a>
             <p>
-              Your one-stop portal for government services, schemes, and opportunities.
-              Making access simple and transparent for every citizen.
+              {t('footerDescription')}
             </p>
           </div>
 
           {/* Column 2: Quick Links */}
           <div className="footer-links">
-            <h4>Quick Links</h4>
+            <h4>{t('footerQuickLinks')}</h4>
             <ul>
-              <li><a href="/schemes">Schemes</a></li>
-              <li><a href="/jobs">Jobs</a></li>
-              <li><a href="/students">Students</a></li>
-              <li><a href="/#contact">Contact Us</a></li>
+              <li><a href="/schemes">{t('navSchemes')}</a></li>
+              <li><a href="/jobs">{t('navJobs')}</a></li>
+              <li><a href="/students">{t('navStudents')}</a></li>
+              <li><a href="/#contact">{t('footerContact')}</a></li>
             </ul>
           </div>
 
           {/* Column 3: Social & Legal */}
           <div className="footer-links">
-            <h4>Legal</h4>
+            <h4>{t('footerLegal')}</h4>
             <ul>
-              <li><a href="/privacy-policy">Privacy Policy</a></li>
-              <li><a href="/terms-of-service">Terms of Service</a></li>
+              <li><a href="/privacy-policy">{t('footerPrivacy')}</a></li>
+              <li><a href="/terms-of-service">{t('footerTerms')}</a></li>
             </ul>
           </div>
 
           {/* Column 4: Contact/Social */}
           <div className="footer-contact">
-             <h4>Follow Us</h4>
+             <h4>{t('footerFollowUs')}</h4>
              <div className="social-icons">
                 <a href="#" aria-label="Facebook">F</a>
                 <a href="#" aria-label="Twitter">T</a>
@@ -60,7 +61,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="footer-bottom">
-          <p>© {currentYear} e-Seva. All Rights Reserved.</p>
+          <p>© {currentYear} {t('footerText')}</p>
         </div>
       </div>
     </footer>
