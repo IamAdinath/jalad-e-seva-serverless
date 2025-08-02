@@ -1,0 +1,68 @@
+/*
+  Banner.css
+  Styles for the main hero/banner section.
+*/
+
+/* Pull in the same color variables for consistency */
+:root {
+  --primary-color: #00796b;      /* Deep Teal */
+  --secondary-color: #ffc107;   /* Amber/Gold */
+  --background-color: #fdfdfd;
+  --text-color-light: #ffffff;
+}
+
+.hero-banner {
+  /* A beautiful, vibrant gradient background */
+  background: linear-gradient(135deg, var(--primary-color) 0%, #00bfa5 100%);
+  padding: 100px 0; /* Vertical spacing */
+  text-align: center;
+  color: var(--text-color-light);
+}
+
+.banner-content {
+  max-width: 800px;
+  margin: 0 auto; /* Center the content horizontally */
+}
+
+.hero-title {
+  font-size: 2.5rem; /* Large font for the main headline */
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  font-weight: 300;
+  opacity: 0.9; /* Makes it slightly softer than the main title */
+  margin-bottom: 40px;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: var(--secondary-color);
+  color: #212529; /* Dark text on the bright button */
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 15px 35px;
+  border-radius: 50px; /* Pill shape */
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #ffca2c; /* A slightly brighter gold on hover */
+  transform: translateY(-3px); /* Lifts the button slightly */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments for larger screens */
+@media (min-width: 768px) {
+  .hero-banner {
+    padding: 140px 0;
+  }
+
+  .hero-title {
+    font-size: 3.5rem; /* Even larger text on desktop */
+  }
+}
