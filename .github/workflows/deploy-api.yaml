@@ -1,0 +1,176 @@
+name: Reusable API Deployment
+
+on:
+  workflow_call:
+    inputs:
+      ENV:
+        description: "Environment name (dev/prod)"
+        required: true
+        type: string
+      REGION:
+        description: "AWS region"
+        required: true
+        type: string
+      CODE_BUCKET:
+        description: "S3 bucket for Lambda code"
+        required: true
+        type: string
+      STACK_NAME:
+        description: "CloudFormation stack name"
+        required: true
+        type: string
+      LAMBDA_FUNCTION_NAME:
+        description: "Lambda function name"
+        required: true
+        type: string
+      DEFAULT_PYTHON_RUNTIME:
+        description: "Python runtime for Lambda"
+        default: "3.12"
+        type: string
+      PROJECT_NAME:
+        description: "Project name for parameter overrides"
+        required: true
+        type: string
+        default: "jalad"
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENV }}
+
+    env:
+      ENV: ${{ inputs.ENV }}
+      REGION: ${{ inputs.REGION }}
+      CODE_BUCKET: ${{ inputs.CODE_BUCKET }}
+      STACK_NAME: ${{ inputs.STACK_NAME }}
+      LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
+      DEFAULT_PYTHON_RUNTIME: ${{ inputs.DEFAULT_PYTHON_RUNTIME }}
+      PROJECT_NAME: ${{ inputs.PROJECT_NAME }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_RUNTIME }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
+      # Step 1: Package Lambda code
+      - name: Package Lambda
+        working-directory: api/lambda
+        run: |
+          pip install -r requirements.txt --target ./
+          zip -r ../../api/cloudformation/portfolio.zip .
+
+      # Step 2: Ensure S3 bucket exists
+      - name: Ensure S3 bucket exists
+        run: |
+          if ! aws s3api head-bucket --bucket "$CODE_BUCKET" 2>/dev/null; then
+            echo "Creating S3 bucket $CODE_BUCKET..."
+            if [ "$REGION" = "us-east-1" ]; then
+              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION"
+            else
+              aws s3api create-bucket --bucket "$CODE_BUCKET" --region "$REGION" \
+                --create-bucket-configuration LocationConstraint="$REGION"
+            fi
+          else
+            echo "Bucket $CODE_BUCKET already exists."
+          fi
+
+      # Step 3: Upload Lambda ZIP to S3
+      - name: Upload Lambda ZIP to S3
+        working-directory: api/cloudformation
+        run: |
+          TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
+          CODE_PATH="$ENV/$TIMESTAMP"
+          echo "CODE_PATH=$CODE_PATH" >> $GITHUB_ENV
+          aws s3 cp portfolio.zip s3://$CODE_BUCKET/$CODE_PATH/portfolio.zip
+
+      # Step 4: Check if CloudFormation stack exists
+      - name: Check if CloudFormation stack exists
+        id: check_stack
+        run: |
+          if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 5: Deploy stack (first time)
+      - name: Deploy stack (first time)
+        if: steps.check_stack.outputs.exists == 'false'
+        working-directory: api/cloudformation
+        run: |
+          aws cloudformation deploy \
+            --template-file template.yaml \
+            --s3-bucket $CODE_BUCKET \
+            --s3-prefix $CODE_PATH \
+            --stack-name $STACK_NAME \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              Env=$ENV \
+              CodeBucket=$CODE_BUCKET \
+              CodePath="$CODE_PATH/portfolio.zip" \
+              PythonRuntime=$DEFAULT_PYTHON_RUNTIME \
+              LinkedInClientId="" \
+              GoogleClientId="" \
+              GoogleClientSecret="" \
+              LinkedInClientSecret="" \
+              ProjectName=$PROJECT_NAME
+
+
+      # Step 6: Compare templates if stack exists
+      - name: Compare templates
+        if: steps.check_stack.outputs.exists == 'true'
+        id: compare_templates
+        working-directory: api/cloudformation
+        run: |
+          aws cloudformation get-template \
+            --stack-name $STACK_NAME \
+            --query 'TemplateBody' \
+            --output text > deployed-template.yaml || touch deployed-template.yaml
+
+          if ! diff -q deployed-template.yaml template.yaml >/dev/null 2>&1; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 7: Deploy updated stack if template changed
+      - name: Deploy updated stack
+        if: steps.compare_templates.outputs.changed == 'true'
+        working-directory: api/cloudformation
+        run: |
+          aws cloudformation deploy \
+            --template-file template.yaml \
+            --s3-bucket $CODE_BUCKET \
+            --s3-prefix $CODE_PATH \
+            --stack-name $STACK_NAME \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              Env=$ENV \
+              CodeBucket=$CODE_BUCKET \
+              CodePath="$CODE_PATH/portfolio.zip" \
+              PythonRuntime=$DEFAULT_PYTHON_RUNTIME
+
+      # Step 8: Update Lambda code only if template unchanged
+      - name: Update Lambda function code only
+        if: steps.compare_templates.outputs.changed == 'false'
+        run: |
+          aws lambda update-function-code \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --s3-bucket $CODE_BUCKET \
+            --s3-key "$CODE_PATH/portfolio.zip"

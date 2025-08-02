@@ -5,7 +5,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: python3.12
+    Runtime: 3.12
     MemorySize: 256
     Timeout: 45
     CodeUri:
@@ -409,7 +409,7 @@ Parameters:
   PythonRuntime:
     Description: The Python version to use for lambda functions
     Type: String
-    Default: python3.12
+    Default: 3.12
   GoogleClientId:
     Type: String
     Description: Google OAuth Client ID
