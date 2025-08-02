@@ -5,7 +5,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: 3.12
+    Runtime: python3.12
     MemorySize: 256
     Timeout: 45
     CodeUri:
