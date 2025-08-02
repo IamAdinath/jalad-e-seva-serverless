@@ -55,7 +55,7 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: "ReactAppOACjalad"
+        Name: !Sub "ReactAppOAC${Env}"
         Description: "OAC for React S3 Hosting"
         SigningProtocol: "sigv4"
         SigningBehavior: "always"
