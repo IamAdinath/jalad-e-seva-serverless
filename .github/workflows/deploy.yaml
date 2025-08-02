@@ -180,7 +180,7 @@ jobs:
       REGION: ${{ vars.PROD_API_AWS_REGION }}
       CODE_BUCKET: ${{ vars.PROD_API_BUCKET_NAME }}
       STACK_NAME: ${{ vars.PROD_API_STACK_NAME }}
-      DEFAULT_PYTHON_RUNTIME: "python3.12"
+      DEFAULT_PYTHON_RUNTIME: "3.12"
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
 
     steps:

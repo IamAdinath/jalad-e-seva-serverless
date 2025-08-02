@@ -25,7 +25,7 @@ on:
         type: string
       DEFAULT_PYTHON_RUNTIME:
         description: "Python runtime for Lambda"
-        default: "python3.12"
+        default: "3.12"
         type: string
       PROJECT_NAME:
         description: "Project name for parameter overrides"
@@ -130,7 +130,7 @@ jobs:
               GoogleClientSecret="" \
               LinkedInClientSecret="" \
               ProjectName=$PROJECT_NAME
-              
+
 
       # Step 6: Compare templates if stack exists
       - name: Compare templates
