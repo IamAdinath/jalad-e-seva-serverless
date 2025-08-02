@@ -2,6 +2,7 @@ import React from 'react';
 
 // Import the new dedicated CSS file
 import './Features.css';
+import { useTranslation } from 'react-i18next';
 
 interface FeatureItem {
   number: string;
@@ -10,30 +11,32 @@ interface FeatureItem {
 }
 
 const featuresData: FeatureItem[] = [
-  { number: '01', title: 'For Individuals', text: 'Find all the service information you need for your personal certificates & documents.' },
-  { number: '02', title: 'For Students', text: 'We have listed all the required and useful information that can help students.' },
-  { number: '03', title: 'For Farmers', text: 'All the latest schemes and services from the government and others for Farmers.' },
-  { number: '04', title: 'For Businesses', text: 'Find what the government has to offer you as a business owner for their growth.' },
+  { number: '01', title: 'featureForIndiduals', text: 'featureForIndidualsDescription' },
+  { number: '02', title: 'featureForStudents', text: 'featureForStudentsDescription' },
+  { number: '03', title: 'featureForFarmers', text: 'featureForFarmersDescription' },
+  { number: '04', title: 'featureForBusinesses', text: 'featureForBusinessesDescription' },
 ];
 
 const Features: React.FC = () => {
+  const { t } = useTranslation();
   return (
+     
     // We use our new class '.features-section'
     <section id="features" className="features-section">
       <div className="container">
         {/* RECOMMENDED: Add a section heading for context */}
         <div className="section-heading">
-          <h2>Services We Offer</h2>
-          <p>We categorize all services to make them easy to find and access for everyone.</p>
+          <h2>{t('featureServicesWeOffer')}</h2>
+          <p>{t('featureServicesWeOfferDescription')}</p>
         </div>
 
         <div className="features-grid">
           {featuresData.map((feature, index) => (
             <div className="features-item" key={index}>
-              <div className="number">{feature.number}</div>
-              <h4>{feature.title}</h4>
+              <div className="number">{t(feature.number)}</div>
+              <h4>{t(feature.title)}</h4>
               <div className="line-dec"></div>
-              <p>{feature.text}</p>
+              <p>{t(feature.text)}</p>
             </div>
           ))}
         </div>
