@@ -91,7 +91,7 @@ on:
 jobs:
   deploy-api-dev:
     if: ${{ github.ref_name != 'master' && github.ref_name != 'main' }}
-    uses: ./.github/workflows/deploy-api.yml
+    uses: .github/workflows/deploy-api.yml
     with:
       ENV: dev
       REGION: ${{ vars.DEV_API_AWS_REGION }}
