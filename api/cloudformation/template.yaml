@@ -269,26 +269,26 @@ Resources:
   #           Identity:
   #             Header: Authorization
 
-  # ConfirmUserLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub confirm-user-${ProjectName}-${Env}
-  #     Handler: users.confirm.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonCognitoPowerUser
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /confirm-user
-  #           Method: POST
-  #     Environment:
-  #       Variables:
-  #         USERS_TABLE: !Ref UsersTable
-  #         USER_POOL_ID: !Ref BlogUserPool
+  ConfirmUserLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub confirm-user-${ProjectName}-${Env}
+      Handler: users.confirm.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonCognitoPowerUser
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /confirm-user
+            Method: POST
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          USER_POOL_ID: !Ref BlogUserPool
 
   # GetBlogsLambda:
   #   Type: AWS::Serverless::Function
