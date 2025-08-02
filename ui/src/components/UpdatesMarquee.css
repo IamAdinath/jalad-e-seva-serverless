@@ -1,0 +1,79 @@
+/*
+  UpdatesMarquee.css
+  Styles for the moving updates bar.
+*/
+
+:root {
+  --primary-color: #00796b;
+  --secondary-color: #ffc107;
+  --text-dark: #212529;
+}
+
+/* The main container bar */
+.updates-marquee-container {
+  background-color: var(--secondary-color);
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* The "UPDATES" label on the left */
+.updates-label {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  /* Adds a slight angled edge for style */
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+}
+
+/*
+  The wrapper that hides the overflow. This creates the "window"
+  through which the moving text is seen.
+*/
+.marquee-wrapper {
+  flex-grow: 1; /* Takes up all remaining space */
+  overflow: hidden; /* This is crucial! */
+}
+
+/* The element that will be animated */
+.marquee-content {
+  display: flex; /* Lines up the items horizontally */
+  white-space: nowrap; /* Prevents text from wrapping */
+  /* This is where the animation is applied */
+  animation: scroll-left 7s linear infinite;
+}
+
+/* An individual update item */
+.update-item {
+  font-weight: 500;
+  margin-right: 60px; /* Space between each update */
+  display: flex;
+  align-items: center;
+}
+
+/* A decorative separator between items */
+.update-item::after {
+  content: '✦';
+  color: var(--primary-color);
+  margin-left: 60px;
+  opacity: 0.8;
+}
+
+/* The CSS animation keyframes */
+@keyframes scroll-left {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    /*
+      We move it -50% because we duplicated the content.
+      This creates a perfect, seamless loop.
+    */
+    transform: translateX(-50%);
+  }
+}

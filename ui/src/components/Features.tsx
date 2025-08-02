@@ -27,11 +27,8 @@ const Features: React.FC = () => {
           <p>We categorize all services to make them easy to find and access for everyone.</p>
         </div>
 
-        {/* The grid of features */}
         <div className="features-grid">
           {featuresData.map((feature, index) => (
-            // The item itself. No need for column classes like 'col-lg-3'
-            // because the parent '.features-grid' now handles the layout.
             <div className="features-item" key={index}>
               <div className="number">{feature.number}</div>
               <h4>{feature.title}</h4>
