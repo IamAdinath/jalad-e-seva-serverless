@@ -83,6 +83,13 @@ jobs:
           npm run build
           aws s3 sync dist s3://$CODE_BUCKET --delete
 
+      # Step 4 - Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $STACK_NAME \
+            --paths "/*"
+
 # --------------------------
 # PROD DEPLOYMENT
 # --------------------------
