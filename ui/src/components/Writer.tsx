@@ -1,21 +1,16 @@
-import React, { useState } from 'react';
-// 1. Import the 'Editor' type for better type safety
-import { useEditor, EditorContent, type Editor } from '@tiptap/react'; 
+import React, { useState, useCallback } from 'react';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 
 import './Writer.css';
+import { useTranslation } from 'react-i18next';
 
-// --- The Toolbar Component ---
-// We now use the imported 'Editor' type for our props.
+// --- MenuBar component remains the same ---
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
-  if (!editor) {
-    return null;
-  }
-
+  if (!editor) { return null; }
   return (
     <div className="tiptap-menu-bar">
-      {/* This button should now work correctly */}
       <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'is-active' : ''}>Bold</button>
       <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'is-active' : ''}>Italic</button>
       <button onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'is-active' : ''}>Strike</button>
@@ -28,20 +23,17 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
   );
 };
 
-
 // --- The Main Writer Component ---
 const Writer: React.FC = () => {
+  const {t} = useTranslation();
   const [summary, setSummary] = useState('');
-  const [thumbnail, setThumbnail] = useState<File | null>(null); // State for the image file
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const editor = useEditor({
     extensions: [
-      // 2. We explicitly ensure StarterKit is configured. 
-      // This is the most reliable way to enable its default features like 'bold'.
-      StarterKit.configure(), 
-      Placeholder.configure({
-        placeholder: 'Start writing your amazing story here…',
-      }),
+      StarterKit.configure(),
+      Placeholder.configure({ placeholder: "Type your content here..." }),
     ],
     content: '',
     onUpdate: ({ editor }) => {
@@ -50,6 +42,33 @@ const Writer: React.FC = () => {
       setSummary(summaryText);
     },
   });
+
+  // NEW FUNCTION: Handles file selection and creates a preview URL
+  const handleFileChange = useCallback((file: File | null) => {
+    if (file) {
+      setThumbnail(file);
+      // Create a temporary URL for the selected file to show a preview
+      const newPreviewUrl = URL.createObjectURL(file);
+      setPreviewUrl(newPreviewUrl);
+    } else {
+      setThumbnail(null);
+      setPreviewUrl(null);
+    }
+  }, []);
+
+  // NEW FUNCTION: To handle drag-and-drop functionality
+  const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+      handleFileChange(event.dataTransfer.files[0]);
+    }
+  }, [handleFileChange]);
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
   
   const handlePublish = () => {
     if (!editor) return;
@@ -69,32 +88,67 @@ const Writer: React.FC = () => {
 
   return (
     <div className="writer-container">
-      {/* ... MenuBar and EditorContent ... */}
+      {/* SECTION 1: THUMBNAIL UPLOAD (NOW ON TOP) */}
+      <div className="form-group">
+        <div className="summary-preview">
+          <label>{t('writerCategorySelect')}</label>
+          <select className="summary-preview">
+            <option value="general">{t('writerCategoryGeneral')}</option>
+            <option value="news">{t('writerCategoryNews')}</option>
+            <option value="updates">{t('writerCategoryUpdates')}</option>
+            <option value="events">{t('writerCategoryEvents')}</option>
+            <option value="student">{t('navStudents')}</option>
+            <option value="farmer">{t('navFarmers')}</option>
+            <option value="business">{t('navBusinesses')}</option>
+            <option value="artist">{t('navJobs')}</option>
+            <option value="individual">{t('navIndividuals')}</option>
+            <option value="ngo">{t('navNGOs')}</option>
+            <option value="government">{t('navGovernment')}</option>
+            <option value="education">{t('navEducation')}</option>
+            <option value="health">{t('navHealth')}</option>
+            <option value="technology">{t('navTechnology')}</option>
+            <option value="environment">{t('navEnvironment')}</option>
+            <option value="culture">{t('navCulture')}</option>
+            <option value="other">{t('navOthers')}</option>
+          </select>
+        </div>
+
+        <label>{t('writerThumbnailTitle')}</label>
+        <div 
+          className="image-dropzone"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onClick={() => document.getElementById('thumbnail-input')?.click()}
+        >
+          {previewUrl ? (
+            <img src={previewUrl} alt="Thumbnail preview" className="image-preview" />
+          ) : (
+            <p>{t('writerThumbnailPlaceholder')}</p>
+          )}
+          <input 
+            id="thumbnail-input"
+            type="file" 
+            accept="image/*"
+            style={{ display: 'none' }} // Hide the default input
+            onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
+          />
+        </div>
+      </div>
+      
+      {/* SECTION 2: THE EDITOR (NOW IN THE MIDDLE) */}
       <div className="editor-wrapper">
         <MenuBar editor={editor} />
         <EditorContent editor={editor} />
       </div>
 
-      {/* 3. ADDED THE FILE INPUT BACK IN ITS OWN FORM GROUP */}
+      {/* SECTION 3: SUMMARY AND PUBLISH */}
       <div className="form-group">
-        <label htmlFor="thumbnail">Featured Image (Thumbnail)</label>
-        <input 
-          id="thumbnail"
-          type="file" 
-          accept="image/*"
-          onChange={(e) => setThumbnail(e.target.files ? e.target.files[0] : null)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Auto-Generated Summary (for previews)</label>
-        <p className="summary-preview">{summary || 'Start typing to see a summary...'}</p>
+        <label>{t('witerSummaryTitle')}</label>
+        <p className="summary-preview">{summary || t('writerSummaryPlaceholder')}</p>
       </div>
 
       <div className="publish-button-container">
-        <button onClick={handlePublish} className="publish-button">
-          Publish Post
-        </button>
+        <button onClick={handlePublish} className="publish-button">{t('writerPublish')}</button>
       </div>
     </div>
   );

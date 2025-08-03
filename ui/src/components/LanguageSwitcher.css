@@ -1,26 +1,50 @@
+/*
+  LanguageSwitcher.css
+  Updated styles for a custom dropdown menu.
+*/
+
 .language-switcher {
-  display: flex;
-  gap: 10px;
+  position: relative;
+  display: inline-block;
 }
 
-.language-switcher button {
-  background-color: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-light);
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
+.language-select {
+  /* --- Appearance --- */
+  background-color: #f8f9fa;
+  color: var(--text-color);
+  padding: 8px 30px 8px 15px; /* Extra padding on the right for the arrow */
+  font-size: 1rem;
   font-weight: 500;
+  border: 1px solid var(--border-color);
+  border-radius: 50px; /* Pill shape for a modern look */
+  cursor: pointer;
   transition: all 0.3s ease;
+  
+  /* --- Remove default browser styling --- */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.language-switcher button:hover {
-  background-color: var(--background-light);
+.language-select:hover {
   border-color: var(--primary-color);
+  background-color: #f1f3f5;
 }
 
-.language-switcher button.active {
-  background-color: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
+.language-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2); /* A focus ring for accessibility */
+}
+
+/* --- Custom Dropdown Arrow --- */
+/* We add a custom arrow using a pseudo-element for a consistent look */
+.language-switcher::after {
+  content: '▼';
+  font-size: 0.7rem;
+  color: var(--primary-color);
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* Allows clicks to go through to the select element */
 }
