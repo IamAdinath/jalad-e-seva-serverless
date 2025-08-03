@@ -49,6 +49,9 @@
 
   "writerPlaceholder": "आता, येथे लिहायला सुरू करा…",
   "writerSummaryPlaceholder": "सारांश पाहण्यासाठी लिहायला सुरू करा...",
+  "writerTitle": "पोस्ट शीर्षक",
+  "writerTitlePlaceholder": "तुमचे पोस्ट शीर्षक प्रविष्ट करा",
+  "writerContent": "तुमची माहिती येथे लिहा...",
   "witerSummaryTitle": "स्वयंचलित-निर्मित सारांश",
   "writerThumbnailTitle": "वैशिष्ट्यीकृत प्रतिमा (थंबनेल)",
   "writerThumbnailPlaceholder": "प्रतिमा ड्रॅग आणि ड्रॉप करा, किंवा फाइल निवडण्यासाठी क्लिक करा",
@@ -81,6 +84,9 @@
   "BlogLastDateDescription": "या योजनेसाठी किंवा नोकरीसाठी अर्ज करण्याची अंतिम तारीख.",
   "BlogLastDateExpired": "ही योजना किंवा नोकरी कालबाह्य झाली आहे.",
   "BlogLastDateExtension": "वाढीव तारीख",
+  "BlogStartDate": "प्रारंभ तारीख",
+  "BlogStartDateDescription": "या योजनेसाठी किंवा नोकरीसाठी अर्ज सुरू होण्याची तारीख.",
+  "BlogEndDate": "समाप्ती तारीख",
 
   "footerDescription": "सरकारी सेवा, योजना आणि संधींसाठी तुमचा एक-स्टॉप पोर्टल. प्रत्येक नागरिकासाठी प्रवेश सुलभ आणि पारदर्शक बनवणे.",
   "footerText": "जलद-ई-सेवा. सर्व हक्क राखीव.",

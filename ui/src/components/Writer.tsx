@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
 
+
 // Import the dedicated CSS file
 import './Writer.css';
 
@@ -58,26 +59,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 const Writer: React.FC = () => {
   // Using a mock t function if i18next is not set up.
   // Replace with: const { t, i18n } = useTranslation();
-  const t = (key: string) => {
-    const translations: { [key: string]: string } = {
-        writerTitle: "Title",
-        writerTitlePlaceholder: "Enter a captivating title...",
-        writerThumbnailTitle: "Featured Image",
-        writerThumbnailPlaceholder: "Click or drag & drop an image here",
-        writerContentTitle: "Content",
-        writerPlaceholder: "Start writing your amazing story...",
-        BlogStartDate: "Start Date",
-        BlogEndDate: "End Date",
-        writerCategorySelect: "Category",
-        writerCategoryGeneral: "General",
-        writerCategoryNews: "News",
-        writerCategoryUpdates: "Updates",
-        writerPublish: "Publish Post",
-    };
-    return translations[key] || key;
-  };
-  const i18n = { language: 'en' }; // Mock i18n object
-
+  const {t} =  useTranslation();
   // State for all form fields
   const [title, setTitle] = useState('');
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -91,7 +73,7 @@ const Writer: React.FC = () => {
     extensions: [
       StarterKit.configure(),
       Placeholder.configure({
-        placeholder: t('writerPlaceholder'),
+        placeholder: "Write Scheme content in detail...",
       }),
     ],
     content: '',
@@ -102,10 +84,10 @@ const Writer: React.FC = () => {
     if (editor) {
       editor.extensionManager.extensions.find(
         (ext) => ext.name === 'placeholder'
-      )!.options.placeholder = t('writerPlaceholder');
+      )!.options.placeholder = "Write Scheme content in detail...";
       editor.view.dispatch(editor.view.state.tr);
     }
-  }, [editor, i18n.language, t]);
+  }, [editor, t]);
 
   // Handles file selection and creates a preview URL
   const handleFileChange = useCallback((file: File | null) => {
@@ -196,7 +178,7 @@ const Writer: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label>{t('writerContentTitle')}</label>
+          <label>{t('writerContent')}</label>
           <div className="editor-container">
             <MenuBar editor={editor} />
             <EditorContent editor={editor} className="writer-content" />
