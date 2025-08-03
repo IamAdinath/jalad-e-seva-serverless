@@ -79,7 +79,7 @@ jobs:
       - name: Build and Sync UI to S3
         working-directory: ui
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
           aws s3 sync dist s3://$CODE_BUCKET --delete
 
@@ -160,6 +160,6 @@ jobs:
       - name: Build and Sync UI to S3
         working-directory: ui
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
           aws s3 sync dist s3://$CODE_BUCKET --delete

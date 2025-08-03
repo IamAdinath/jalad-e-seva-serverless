@@ -4,6 +4,7 @@ import Banner from "../components/Banner";
 import Features from "../components/Features";
 import Footer from "../components/Footer";
 import UpdatesMarquee from "../components/UpdatesMarquee";
+import Header from "../components/Header";
 
 const Home: React.FC = () => {
   const latestUpdates = [
@@ -15,6 +16,7 @@ const Home: React.FC = () => {
 
   return (
     <>
+      <Header />
       <Preloader />
       <Banner />
       <UpdatesMarquee updates={latestUpdates} />
