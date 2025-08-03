@@ -72,6 +72,16 @@
   "writerCategoryUpdates": "अद्यतने",
   "writerCategoryEvents": "कार्यक्रम",
 
+  "BloglistTitle": "नवीनतम ब्लॉग पोस्ट",
+  "BloglistDescription": "सरकारी योजना, नोकऱ्या आणि सेवांवरीलचे आमचे ताजे विचार आणि अद्यतने वाचा.",
+  "BloglistReadMore": "अधिक वाचा",
+  "BloglistNoPosts": "काहीही ब्लॉग पोस्ट सापडले नाही. कृपया नंतर पुन्हा तपासा.",
+
+  "BlogLastDate": "अंतिम तारीख",
+  "BlogLastDateDescription": "या योजनेसाठी किंवा नोकरीसाठी अर्ज करण्याची अंतिम तारीख.",
+  "BlogLastDateExpired": "ही योजना किंवा नोकरी कालबाह्य झाली आहे.",
+  "BlogLastDateExtension": "वाढीव तारीख",
+
   "footerDescription": "सरकारी सेवा, योजना आणि संधींसाठी तुमचा एक-स्टॉप पोर्टल. प्रत्येक नागरिकासाठी प्रवेश सुलभ आणि पारदर्शक बनवणे.",
   "footerText": "जलद-ई-सेवा. सर्व हक्क राखीव.",
   "footerPrivacy": "गोपनीयता धोरण",
