@@ -176,3 +176,16 @@ jobs:
           npm install --legacy-peer-deps
           npm run build
           aws s3 sync dist s3://$CODE_BUCKET --delete
+
+      # Step 4 - Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache
+        run: |
+          DISTRIBUTION_ID=$(aws --region ${REGION} cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionID'].OutputValue" --output text)
+          if [ -z "$DISTRIBUTION_ID" ]; then
+            echo "CloudFront distribution ID not found."
+            exit 1
+          fi
+          echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/" "/*"
