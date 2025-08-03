@@ -1,155 +1,215 @@
-import React, { useState, useCallback } from 'react';
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-
-import './Writer.css';
 import { useTranslation } from 'react-i18next';
 
-// --- MenuBar component remains the same ---
+
+// Import the dedicated CSS file
+import './Writer.css';
+
+// --- MenuBar Component for Toolbar (CORRECTED) ---
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
-  if (!editor) { return null; }
+  if (!editor) {
+    return null;
+  }
+
+  // This helper function now correctly builds the command chain on click
+  const createMenuButton = (
+    // The 'action' now directly corresponds to the Tiptap command, e.g., "toggleBold"
+    commandName: string,
+    // 'name' is used for the isActive check, e.g., "bold"
+    activeName: string,
+    icon: React.ReactNode,
+    label: string,
+    params?: any
+  ) => {
+    // The command chain is now created and run directly inside the onClick handler.
+    // This ensures it's always fresh and targets the current editor state.
+    const action = () => (editor.chain().focus() as any)[commandName](params).run();
+
+    return (
+      <button
+        type="button"
+        onClick={action}
+        className={editor.isActive(activeName, params) ? 'is-active' : ''}
+        title={label}
+        // Disable button if the command cannot be executed
+        disabled={!(editor.can() as any)[commandName](params)}
+      >
+        {icon}
+      </button>
+    );
+  };
+
   return (
-    <div className="tiptap-menu-bar">
-      <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'is-active' : ''}>Bold</button>
-      <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'is-active' : ''}>Italic</button>
-      <button onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'is-active' : ''}>Strike</button>
-      <button onClick={() => editor.chain().focus().setParagraph().run()} className={editor.isActive('paragraph') ? 'is-active' : ''}>Paragraph</button>
-      <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}>H1</button>
-      <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}>H2</button>
-      <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={editor.isActive('bulletList') ? 'is-active' : ''}>Bullet List</button>
-      <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={editor.isActive('orderedList') ? 'is-active' : ''}>Ordered List</button>
+    <div className="writer-menubar">
+      {createMenuButton('toggleBold', 'bold', <b>B</b>, 'Bold')}
+      {createMenuButton('toggleItalic', 'italic', <i>I</i>, 'Italic')}
+      {createMenuButton('toggleStrike', 'strike', <s>S</s>, 'Strikethrough')}
+      {createMenuButton('toggleHeading', 'heading', 'H₂', 'Heading (Level 2)', { level: 2 })}
+      {createMenuButton('toggleBulletList', 'bulletList', '●', 'Bullet List')}
+      {createMenuButton('toggleOrderedList', 'orderedList', '1.', 'Ordered List')}
     </div>
   );
 };
 
-// --- The Main Writer Component ---
+
+// --- The Main Writer Component (No other logic changes needed here) ---
 const Writer: React.FC = () => {
-  const {t} = useTranslation();
-  const [summary, setSummary] = useState('');
+  // Using a mock t function if i18next is not set up.
+  // Replace with: const { t, i18n } = useTranslation();
+  const {t} =  useTranslation();
+  // State for all form fields
+  const [title, setTitle] = useState('');
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [category, setCategory] = useState('general');
 
+  // Tiptap editor instance
   const editor = useEditor({
     extensions: [
       StarterKit.configure(),
-      Placeholder.configure({ placeholder: "Type your content here..." }),
+      Placeholder.configure({
+        placeholder: "Write Scheme content in detail...",
+      }),
     ],
     content: '',
-    onUpdate: ({ editor }) => {
-      const plainText = editor.getText();
-      const summaryText = plainText.split(/\s+/).slice(0, 20).join(' ') + (plainText.split(/\s+/).length > 20 ? '...' : '');
-      setSummary(summaryText);
-    },
   });
 
-  // NEW FUNCTION: Handles file selection and creates a preview URL
+  // Effect to update placeholder on language change
+  useEffect(() => {
+    if (editor) {
+      editor.extensionManager.extensions.find(
+        (ext) => ext.name === 'placeholder'
+      )!.options.placeholder = "Write Scheme content in detail...";
+      editor.view.dispatch(editor.view.state.tr);
+    }
+  }, [editor, t]);
+
+  // Handles file selection and creates a preview URL
   const handleFileChange = useCallback((file: File | null) => {
     if (file) {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setThumbnail(file);
-      // Create a temporary URL for the selected file to show a preview
       const newPreviewUrl = URL.createObjectURL(file);
       setPreviewUrl(newPreviewUrl);
-    } else {
-      setThumbnail(null);
-      setPreviewUrl(null);
     }
-  }, []);
+  }, [previewUrl]);
 
-  // NEW FUNCTION: To handle drag-and-drop functionality
+  // Handles drag-and-drop functionality
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    event.stopPropagation();
+    event.currentTarget.classList.remove('is-dragging-over');
     if (event.dataTransfer.files && event.dataTransfer.files[0]) {
       handleFileChange(event.dataTransfer.files[0]);
     }
   }, [handleFileChange]);
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  
+  // Placeholder for publishing logic
   const handlePublish = () => {
-    if (!editor) return;
-    const htmlContent = editor.getHTML();
-    if (editor.getText().trim().length === 0) {
-      alert('Cannot publish an empty post!');
+    if (!editor || editor.getText().trim() === '') {
+      alert('Content cannot be empty.');
       return;
     }
+    if (!title.trim()) {
+      alert('Title cannot be empty.');
+      return;
+    }
+
     const blogPostData = {
-      htmlContent: htmlContent,
-      summary: summary,
-      thumbnailFile: thumbnail, // We include the thumbnail file in our data
+      title,
+      htmlContent: editor.getHTML(),
+      textContent: editor.getText(),
+      thumbnailFile: thumbnail,
+      startDate,
+      endDate,
+      category,
+      status: 'draft', // or 'published'
+      publishDate: new Date().toISOString(),
     };
-    console.log("Data to be sent to API:", blogPostData);
-    alert('Check the console to see the data!');
+
+    console.log("PUBLISHING DATA:", blogPostData);
+    alert('Post data has been logged to the console!');
   };
 
   return (
     <div className="writer-container">
-      {/* SECTION 1: THUMBNAIL UPLOAD (NOW ON TOP) */}
-      <div className="form-group">
-        <div className="summary-preview">
-          <label>{t('writerCategorySelect')}</label>
-          <select className="summary-preview">
-            <option value="general">{t('writerCategoryGeneral')}</option>
-            <option value="news">{t('writerCategoryNews')}</option>
-            <option value="updates">{t('writerCategoryUpdates')}</option>
-            <option value="events">{t('writerCategoryEvents')}</option>
-            <option value="student">{t('navStudents')}</option>
-            <option value="farmer">{t('navFarmers')}</option>
-            <option value="business">{t('navBusinesses')}</option>
-            <option value="artist">{t('navJobs')}</option>
-            <option value="individual">{t('navIndividuals')}</option>
-            <option value="ngo">{t('navNGOs')}</option>
-            <option value="government">{t('navGovernment')}</option>
-            <option value="education">{t('navEducation')}</option>
-            <option value="health">{t('navHealth')}</option>
-            <option value="technology">{t('navTechnology')}</option>
-            <option value="environment">{t('navEnvironment')}</option>
-            <option value="culture">{t('navCulture')}</option>
-            <option value="other">{t('navOthers')}</option>
-          </select>
-        </div>
-
-        <label>{t('writerThumbnailTitle')}</label>
-        <div 
-          className="image-dropzone"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onClick={() => document.getElementById('thumbnail-input')?.click()}
-        >
-          {previewUrl ? (
-            <img src={previewUrl} alt="Thumbnail preview" className="image-preview" />
-          ) : (
-            <p>{t('writerThumbnailPlaceholder')}</p>
-          )}
-          <input 
-            id="thumbnail-input"
-            type="file" 
-            accept="image/*"
-            style={{ display: 'none' }} // Hide the default input
-            onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
+      <div className="writer-layout">
+        <div className="form-group">
+          <label htmlFor="post-title">{t('writerTitle')}</label>
+          <input
+            id="post-title"
+            type="text"
+            className="form-input title-input"
+            placeholder={t('writerTitlePlaceholder')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-      </div>
-      
-      {/* SECTION 2: THE EDITOR (NOW IN THE MIDDLE) */}
-      <div className="editor-wrapper">
-        <MenuBar editor={editor} />
-        <EditorContent editor={editor} />
+
+        <div className="form-group">
+          <label>{t('writerThumbnailTitle')}</label>
+          <div
+            className="image-dropzone"
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            onDragEnter={(e) => e.currentTarget.classList.add('is-dragging-over')}
+            onDragLeave={(e) => e.currentTarget.classList.remove('is-dragging-over')}
+            onClick={() => document.getElementById('thumbnail-input')?.click()}
+          >
+            {previewUrl ? (
+              <img src={previewUrl} alt="Thumbnail Preview" className="image-preview" />
+            ) : (
+              <p>{t('writerThumbnailPlaceholder')}</p>
+            )}
+            <input
+              id="thumbnail-input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+              style={{ display: 'none' }}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>{t('writerContent')}</label>
+          <div className="editor-container">
+            <MenuBar editor={editor} />
+            <EditorContent editor={editor} className="writer-content" />
+          </div>
+        </div>
+
+        <div className="metadata-row">
+          <div className="form-group">
+            <label htmlFor="startDate">{t('BlogStartDate')}</label>
+            <input id="startDate" type="date" className="date-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="endDate">{t('BlogEndDate')}</label>
+            <input id="endDate" type="date" className="date-input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="category">{t('writerCategorySelect')}</label>
+            <select id="category" className="form-input" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="general">{t('writerCategoryGeneral')}</option>
+              <option value="news">{t('writerCategoryNews')}</option>
+              <option value="updates">{t('writerCategoryUpdates')}</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* SECTION 3: SUMMARY AND PUBLISH */}
-      <div className="form-group">
-        <label>{t('witerSummaryTitle')}</label>
-        <p className="summary-preview">{summary || t('writerSummaryPlaceholder')}</p>
-      </div>
-
-      <div className="publish-button-container">
-        <button onClick={handlePublish} className="publish-button">{t('writerPublish')}</button>
-      </div>
+      <footer className="writer-footer">
+        <button type="button" onClick={handlePublish} className="publish-button">
+          {t('writerPublish')}
+        </button>
+      </footer>
     </div>
   );
 };

@@ -47,6 +47,9 @@
 
   "writerPlaceholder": "Now, start writing here…",
   "writerSummaryPlaceholder": "Start writing to see a summary...",
+  "writerTitle": "Post Title",
+  "writerTitlePlaceholder": "Enter your post title",
+  "writerContent": "Write your content here...",
   "witerSummaryTitle": "Auto-Generated Summary",
   "writerThumbnailTitle": "Featured Image (Thumbnail)",
   "writerThumbnailPlaceholder": "Drag & drop an image here, or click to select a file",
@@ -69,6 +72,20 @@
   "writerCategoryNews": "News",
   "writerCategoryUpdates": "Updates",
   "writerCategoryEvents": "Events",
+
+  "BloglistTitle": "Latest Blog Posts",
+  "BloglistDescription": "Read our latest insights and updates on government schemes, jobs, and services.",
+  "BloglistReadMore": "Read More",
+  "BloglistNoPosts": "No blog posts found. Please check back later.",
+
+
+  "BlogLastDate": "Last Date",
+  "BlogLastDateDescription": "The last date to apply for this scheme or job.",
+  "BlogLastDateExpired": "This scheme or job has expired.",
+  "BlogLastDateExtension": "Extended Date",
+  "BlogStartDate": "Start Date",
+  "BlogStartDateDescription": "The date when this scheme or job application starts.",
+  "BlogEndDate": "End Date",
 
   "footerDescription": "Your one-stop portal for government services, schemes, and opportunities. Making access simple and transparent for every citizen.",
   "footerText": " Jalad-e-Seva. All rights reserved.",
