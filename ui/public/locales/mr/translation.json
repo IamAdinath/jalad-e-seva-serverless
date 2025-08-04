@@ -37,7 +37,7 @@
   "navLanguage": "भाषा",
 
   "featureServicesWeOffer": "आमच्या सेवा",
-  "featureServicesWeOfferDescription": "आम्ही तुमच्या गरजा भागवण्यासाठी विस्तृत सरकारी सेवा प्रदान करतो.",
+  "featureServicesWeOfferDescription": "नागरिकांसाठी सुलभ, पारदर्शक आणि कार्यक्षम सुविधा देण्यासाठी आम्ही सर्वसमावेशक सरकारी सेवा उपलब्ध करून देतो.",
   "featureForIndiduals": "व्यक्तींसाठी",
   "featureForIndidualsDescription": "नोकरी अर्ज, योजना नोंदणी आणि इतर महत्त्वाच्या सेवांपर्यंत प्रवेश मिळवा.",
   "featureForStudents": "विद्यार्थ्यांसाठी",
@@ -109,5 +109,25 @@
   "footerLanguageMarathi": "मराठी",
   "footerLanguageHindi": "हिंदी",
   "footerQuickLinks": "त्वरित दुवे",
-  "footerLegal": "कायदेशीर"
+  "footerLegal": "कायदेशीर",
+
+  "messageBlogCreated": "ब्लॉग पोस्ट यशस्वीरित्या तयार केले.",
+  "messageBlogUpdated": "ब्लॉग पोस्ट यशस्वीरित्या अद्यतनित केले.",
+  "messageBlogDeleted": "ब्लॉग पोस्ट यशस्वीरित्या हटवले.",
+  "messageBlogNotFound": "ब्लॉग पोस्ट सापडले नाही.",
+  "messageBlogError": "ब्लॉग पोस्ट तयार करताना त्रुटी आली.",
+  "messageBlogUnauthorized": "तुम्हाला या क्रियेसाठी अधिकृत नाही.",
+  "messageBlogAccessDenied": "तुम्हाला या ब्लॉग पोस्टवर प्रवेश नाही.",
+  "messageBlogInvalidData": "अवैध डेटा. कृपया सर्व आवश्यक फील्ड्स भरा.",
+  "messageBlogTitleRequired": "ब्लॉग पोस्ट शीर्षक आवश्यक आहे.",
+  "messageBlogContentRequired": "ब्लॉग पोस्ट सामग्री आवश्यक आहे.",
+  "messageBlogCategoryRequired": "ब्लॉग पोस्ट श्रेणी आवश्यक आहे.",
+  "messageBlogImageRequired": "ब्लॉग पोस्ट प्रतिमा आवश्यक आहे.",
+  "messageBlogTagsRequired": "ब्लॉग पोस्ट टॅग आवश्यक आहेत.",
+  "messageBlogReadingTimeRequired": "ब्लॉग पोस्ट वाचन वेळ आवश्यक आहे.",
+  "messageBlogStatusRequired": "ब्लॉग पोस्ट स्थिती आवश्यक आहे.",
+  "messageBlogCategoryNotFound": "ब्लॉग पोस्ट श्रेणी सापडली नाही.",
+  "messageBlogImageUploadError": "ब्लॉग पोस्ट प्रतिमा अपलोड करताना त्रुटी आली.",
+  "messageBlogImageInvalid": "ब्लॉग पोस्ट प्रतिमा अवैधारित आहे. कृपया JPEG, PNG किंवा GIF स्वरूप वापरा.",
+  "messageBlogImageTooLarge": "ब्लॉग पोस्ट प्रतिमा आकार 5MB पेक्षा कमी असावा"
 }
