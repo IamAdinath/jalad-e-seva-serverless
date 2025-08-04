@@ -3,7 +3,7 @@ import json
 import boto3
 import logging
 
-from common.contsants import StatusCodes, Headers
+from common.constants import StatusCodes, Headers
 from common.utils import build_response
 from common.s3 import put_s3_file, get_s3_file_url
 
@@ -37,7 +37,7 @@ def lambda_handler(event, context):
             logger.error("Invalid JSON payload")
             return build_response(
                 StatusCodes.BAD_REQUEST,
-                Headers.CORS,
+                Headers.DEFAULT,
                 {"error": "Invalid JSON payload"},
             )
 

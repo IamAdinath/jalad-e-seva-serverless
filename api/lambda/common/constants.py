@@ -10,7 +10,7 @@ class StatusCodes:
 
 
 class Headers:
-    Default = {
+    DEFAULT = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
     }
