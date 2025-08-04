@@ -311,27 +311,27 @@ Resources:
   #         BLOGS_TABLE: !Ref BlogsTable
   #         MEDIA_BCUKET: !Ref MediaBucket
 
-  # CreateBlogsLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub create-blogs-${ProjectName}-${Env}
-  #     Handler: blogs.create.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /create-blog
-  #           Method: POST
-  #           Auth:
-  #             Authorizer: CognitoAuth
-  #     Environment:
-  #       Variables:
-  #         BLOGS_TABLE: !Ref BlogsTable
-  #         ENV : !Ref Env
+  CreateBlogsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub create-blogs-${ProjectName}-${Env}
+      Handler: blogs.create.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /create-blog
+            Method: POST
+            # Auth:
+            #   Authorizer: CognitoAuth
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          ENV : !Ref Env
 
   
   # DownloadResumeLambda:
@@ -375,25 +375,25 @@ Resources:
   #         BLOGS_TABLE: !Ref BlogsTable
   #         MEDIA_BCUKET: !Ref MediaBucket
 
-  # UploadToS3Lambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub upload-to-s3-${ProjectName}-${Env}
-  #     Handler: common.upload_to_s3.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /upload-to-s3
-  #           Method: POST
-  #     Environment:
-  #       Variables:
-  #         MEDIA_BUCKET: !Ref MediaBucket
-  #         ENV : !Ref Env
+  UploadToS3Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub upload-to-s3-${ProjectName}-${Env}
+      Handler: common.upload_to_s3.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonS3FullAccess
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /upload-to-s3
+            Method: POST
+      Environment:
+        Variables:
+          MEDIA_BUCKET: !Ref MediaBucket
+          ENV : !Ref Env
 
 Parameters:
   Env:
