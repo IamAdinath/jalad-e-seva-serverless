@@ -262,12 +262,12 @@ Resources:
         AllowMethods: OPTIONS,GET,POST,PUT,DELETE
         AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
         AllowOrigin: "*"
-      Auth:
-        Authorizers:
-          CognitoAuth:
-            UserPoolArn: !GetAtt BlogUserPool.Arn
-            Identity:
-              Header: Authorization
+      # Auth:
+      #   Authorizers:
+      #     CognitoAuth:
+      #       UserPoolArn: !GetAtt BlogUserPool.Arn
+      #       Identity:
+      #         Header: Authorization
 
   ConfirmUserLambda:
     Type: AWS::Serverless::Function

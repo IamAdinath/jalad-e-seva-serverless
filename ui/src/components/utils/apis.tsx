@@ -1,10 +1,10 @@
 
 
-const baseUrl = 'https://d3enz4uo3rokqe.cloudfront.net/dev';
+const baseUrl = 'https://yinnvrppse.execute-api.ap-south-1.amazonaws.com/dev';
 const baseHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true',
 };
