@@ -259,9 +259,9 @@ Resources:
       Name: !Sub API-${ProjectName}-${Env}
       StageName: !Ref Env
       Cors:
-        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
+        AllowMethods: OPTIONS,GET,POST,PUT,DELETE
+        AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
+        AllowOrigin: "*"
       Auth:
         Authorizers:
           CognitoAuth:
