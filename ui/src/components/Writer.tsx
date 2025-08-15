@@ -3,7 +3,7 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
-import { createBlog, uploadToS3 } from './apis';
+import { createBlog, uploadToS3 } from './utils/apis';
 
 // Import the dedicated CSS file
 import './Writer.css';
@@ -132,20 +132,20 @@ const Writer: React.FC = () => {
       alert('Start date cannot be after End date.');
       return;
     }
-    
-    
-    const file_url = uploadToS3(thumbnail)
+    const contentSummary = editor.getText().split(/\s+/).slice(0, 15).join(" ") + "...";
+
     const blogPostData = {
       title,
       htmlContent: editor.getHTML(),
-      textContent: editor.getText(),
-      image: file_url,
+      contentSummary: contentSummary,
+      image: thumbnail,
       startDate,
       endDate,
       category,
-      status: 'published', // or 'published'
+      status: "published",
       publishDate: new Date().toISOString(),
     };
+
     const apiCreateBlog = createBlog(blogPostData);
     console.log("PUBLISHING DATA:", apiCreateBlog);
     alert('Post data has been logged to the console!');
