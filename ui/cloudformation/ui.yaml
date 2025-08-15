@@ -93,6 +93,49 @@ Resources:
         PriceClass: "PriceClass_200"
         HttpVersion: "http2"
 
+  ResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub "${ProjectName}-${Env}-header-policy"
+        Comment: Header policy for ${ProjectName} UI
+        CorsConfig:
+          OriginOverride: false
+          AccessControlAllowCredentials: false
+          AccessControlAllowHeaders:
+            Items: ["ALL"]
+          AccessControlAllowMethods:
+            Items: ["POST", "GET", "OPTIONS", "DELETE"]
+          AccessControlAllowOrigins:
+            Items: [!Ref Hostname]
+          AccessControlExposeHeaders:
+            Items: ["ALL"]
+          AccessControlMaxAgeSec: 3600
+        RemoveHeadersConfig:
+          Items:
+            - Header: server
+        ServerTimingHeadersConfig:
+          Enabled: true
+          SamplingRate: 50
+        SecurityHeadersConfig:
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: SAMEORIGIN
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: strict-origin-when-cross-origin
+          XSSProtection:
+            Override: true
+            Protection: true
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: !Sub !Sub "img-src 'self'; script-src ${Hostname} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk='; style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='; object-src 'self';"
+            Override: true
+
 Outputs:
   S3BucketName:
     Description: "S3 bucket name for the React app"
