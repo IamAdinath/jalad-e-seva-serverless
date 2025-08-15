@@ -107,7 +107,7 @@ Resources:
           AccessControlAllowMethods:
             Items: ["POST", "GET", "OPTIONS", "DELETE"]
           AccessControlAllowOrigins:
-            Items: [!Ref ReactAppCDN]
+            Items: [!Sub "https://${ReactAppCDN.DomainName}"]
           AccessControlExposeHeaders:
             Items: ["ALL"]
           AccessControlMaxAgeSec: 3600
@@ -133,7 +133,7 @@ Resources:
             Override: true
             Protection: true
           ContentSecurityPolicy:
-            ContentSecurityPolicy: !Sub "img-src 'self'; script-src ${ReactAppCDN} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk='; style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='; object-src 'self';"
+            ContentSecurityPolicy: !Sub "img-src 'self'; script-src https://${ReactAppCDN.DomainName} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk='; style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='; object-src 'self';"
             Override: true
 
 Outputs:
