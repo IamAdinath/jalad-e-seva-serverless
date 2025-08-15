@@ -3,7 +3,7 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
-import { createBlog, uploadToS3 } from './utils/apis';
+import { createBlog } from './utils/apis';
 
 // Import the dedicated CSS file
 import './Writer.css';
