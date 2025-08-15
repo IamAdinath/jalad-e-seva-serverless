@@ -127,6 +127,8 @@ jobs:
       STACK_NAME: ${{ vars.PROD_UI_STACK_NAME }}
       REACT_APP_API_BASE_URL: ${{ vars.PROD_API_BASE_URL }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+      SSLCertArn: ${{ vars.PROD_UI_SSL_CERT_ARN }}
+      Hostname: ${{ vars.PROD_UI_HOSTNAME }}
 
     steps:
       - name: Checkout code
@@ -160,14 +162,16 @@ jobs:
         working-directory: ui/cloudformation
         run: |
           aws cloudformation deploy \
-            --template-file ui.yaml \
+            --template-file ui-prod.yaml \
             --stack-name $STACK_NAME \
             --region $REGION \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               Env=$ENV \
               BucketName=$CODE_BUCKET \
-              ProjectName=$PROJECT_NAME
+              ProjectName=$PROJECT_NAME \
+              SSLCertArn=$SSLCertArn \
+              Hostname=$Hostname
 
       # Step 3 - Build and Sync UI
       - name: Build and Sync UI to S3
