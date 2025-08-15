@@ -1,0 +1,161 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation template for Jalad E Seva UI"
+Transform: "AWS::Serverless-2016-10-31"
+
+Parameters:
+  SSLCertArn:
+    Description: "ACM Cert ARN for *.example.com"
+    Type: "String"
+  Hostname:
+    Description: "Hostname in DNS for UI"
+    Type: "String"
+  BucketName:
+    Description: "UI Bucket Asset"
+    Type: "String"
+  Env:
+    Description: "Environment for the deployment"
+    Type: "String"
+    Default: "dev"
+  ProjectName:
+    Description: "Project Name"
+    Type: "String"
+    Default: "jalad"
+
+Resources:
+  jaladUIBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: "index.html"
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+    DeletionPolicy: Retain
+
+  BucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref jaladUIBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub arn:aws:s3:::${jaladUIBucket}/*
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${ProjectName}-OAC-${Env}"
+        Description: "OAC for ${ProjectName} S3 Hosting"
+        SigningProtocol: "sigv4"
+        SigningBehavior: "always"
+        OriginAccessControlOriginType: "s3"
+
+  ResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub "${ProjectName}-${Env}-header-policy"
+        Comment: Header policy for ${ProjectName} UI
+        CorsConfig:
+          OriginOverride: false
+          AccessControlAllowCredentials: false
+          AccessControlAllowHeaders:
+            Items: ["ALL"]
+          AccessControlAllowMethods:
+            Items: ["POST", "GET", "OPTIONS", "DELETE"]
+          AccessControlAllowOrigins:
+            Items: [!Ref Hostname]
+          AccessControlExposeHeaders:
+            Items: ["ALL"]
+          AccessControlMaxAgeSec: 3600
+        RemoveHeadersConfig:
+          Items:
+            - Header: server
+        ServerTimingHeadersConfig:
+          Enabled: true
+          SamplingRate: 50
+        SecurityHeadersConfig:
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: SAMEORIGIN
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: strict-origin-when-cross-origin
+          XSSProtection:
+            Override: true
+            Protection: true
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: !Sub >
+              img-src 'self';
+              script-src ${Hostname} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk=';
+              style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
+              object-src 'self';
+            Override: true
+
+  ReactAppCDN:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: "index.html"
+        Origins:
+          - DomainName: !Sub "${jaladUIBucket}.s3.amazonaws.com"
+            Id: !Ref jaladUIBucket
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !Ref CloudFrontOAC
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: false
+            Cookies: {Forward: "none"}
+            Headers: ["Origin"]
+          TargetOriginId: !Ref jaladUIBucket
+          ViewerProtocolPolicy: "redirect-to-https"
+          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SSLCertArn
+          SslSupportMethod: sni-only
+        Aliases:
+          - !Ref Hostname
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponsePagePath: "/index.html"
+            ResponseCode: 200
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponsePagePath: "/index.html"
+            ResponseCode: 200
+            ErrorCachingMinTTL: 0
+        PriceClass: "PriceClass_200"
+        HttpVersion: "http2"
+
+Outputs:
+  S3BucketName:
+    Description: "S3 bucket name for the React app"
+    Value: !Ref jaladUIBucket
+
+  CloudFrontURL:
+    Description: "CloudFront distribution URL"
+    Value: !Sub "https://${ReactAppCDN.DomainName}"
+
+  CloudFrontDistributionID:
+    Description: "CloudFront Distribution ID"
+    Value: !Ref ReactAppCDN
