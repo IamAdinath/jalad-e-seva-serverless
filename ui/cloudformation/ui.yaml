@@ -98,7 +98,7 @@ Resources:
     Properties:
       ResponseHeadersPolicyConfig:
         Name: !Sub "${ProjectName}-${Env}-header-policy"
-        Comment: Header policy for ${ProjectName} UI
+        Comment: !Sub "Response Header policy for ${ProjectName} UI" 
         CorsConfig:
           OriginOverride: false
           AccessControlAllowCredentials: false
@@ -107,7 +107,7 @@ Resources:
           AccessControlAllowMethods:
             Items: ["POST", "GET", "OPTIONS", "DELETE"]
           AccessControlAllowOrigins:
-            Items: [!Ref Hostname]
+            Items: [!Ref ReactAppCDN]
           AccessControlExposeHeaders:
             Items: ["ALL"]
           AccessControlMaxAgeSec: 3600
