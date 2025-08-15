@@ -62,7 +62,13 @@ Resources:
         SigningProtocol: "sigv4"
         SigningBehavior: "always"
         OriginAccessControlOriginType: "s3"
-
+  
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "${ProjectName}-Stack"
+  
   ResponseHeadersPolicy:
     Type: AWS::CloudFront::ResponseHeadersPolicy
     Properties:
@@ -115,21 +121,28 @@ Resources:
     Properties:
       DistributionConfig:
         Enabled: true
+        Comment: !Sub "CloudFront for ${ProjectName} UI"
         DefaultRootObject: "index.html"
         Origins:
           - DomainName: !Sub "${jaladUIBucket}.s3.amazonaws.com"
             Id: !Ref jaladUIBucket
             S3OriginConfig:
-              OriginAccessIdentity: ""
-            OriginAccessControlId: !Ref CloudFrontOAC
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
         DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: !Ref jaladUIBucket
           ForwardedValues:
             QueryString: false
-            Cookies: {Forward: "none"}
-            Headers: ["Origin"]
-          TargetOriginId: !Ref jaladUIBucket
-          ViewerProtocolPolicy: "redirect-to-https"
-          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           AcmCertificateArn: !Ref SSLCertArn
           SslSupportMethod: sni-only
