@@ -279,12 +279,18 @@ Resources:
         - AmazonDynamoDBFullAccess
         - AmazonCognitoPowerUser
       Events:
-        AddItem:
+        confirmUserPost:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /confirm-user
             Method: POST
+        confirmUserOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /confirm-user
+            Method: OPTIONS
       Environment:
         Variables:
           USERS_TABLE: !Ref UsersTable
@@ -321,7 +327,7 @@ Resources:
         - AmazonDynamoDBFullAccess
         - AmazonS3FullAccess
       Events:
-        AddItem:
+        createBlogPost:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
@@ -329,6 +335,12 @@ Resources:
             Method: POST
             # Auth:
             #   Authorizer: CognitoAuth
+        createBlogOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /create-blog
+            Method: OPTIONS
       Environment:
         Variables:
           BLOGS_TABLE: !Ref BlogsTable
