@@ -62,7 +62,13 @@ Resources:
         SigningProtocol: "sigv4"
         SigningBehavior: "always"
         OriginAccessControlOriginType: "s3"
-
+  
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "${ProjectName}-Stack"
+  
   # ResponseHeadersPolicy:
   #   Type: AWS::CloudFront::ResponseHeadersPolicy
   #   Properties:
@@ -131,7 +137,7 @@ Resources:
             - PATCH
             - POST
             - PUT
-          TargetOriginId: !Ref UIBucket
+          TargetOriginId: !Ref jaladUIBucket
           ForwardedValues:
             QueryString: false
             Cookies:
