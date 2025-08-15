@@ -100,7 +100,7 @@ def lambda_handler(event, context):
                     Headers.INTERNAL_SERVER_ERROR,
                     {"message": f"Failed to upload file index {idx} to S3."},
                 )
-            image_urls.append(f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}")
+            image_urls.append(s3_key)
 
         # TTL = endDate + 7 days
         ttl_value = None
@@ -135,7 +135,7 @@ def lambda_handler(event, context):
         return build_response(
             StatusCodes.CREATED,
             Headers.DEFAULT,
-            {"message": "Blog created successfully.", "blog_id": blog_id, "images": image_urls},
+            {"message": "Blog created successfully.", "id": blog_id, "status": "success"}
         )
 
     except Exception as e:
