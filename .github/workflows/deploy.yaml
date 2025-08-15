@@ -147,18 +147,18 @@ jobs:
           aws-region: ${{ env.REGION }}
 
       # Step 1 - Check if stack exists
-      - name: Check if CloudFormation stack exists
-        id: check_stack
-        run: |
-          if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+      # - name: Check if CloudFormation stack exists
+      #   id: check_stack
+      #   run: |
+      #     if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
+      #       echo "exists=true" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "exists=false" >> $GITHUB_OUTPUT
+      #     fi
 
       # Step 2 - Deploy stack (only if it does not exist)
       - name: Deploy UI CloudFormation stack
-        if: steps.check_stack.outputs.exists == 'false'
+        # if: steps.check_stack.outputs.exists == 'false'
         working-directory: ui/cloudformation
         run: |
           aws cloudformation deploy \
