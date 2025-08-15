@@ -319,6 +319,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
       Events:
         AddItem:
           Type: Api
@@ -332,6 +333,7 @@ Resources:
         Variables:
           BLOGS_TABLE: !Ref BlogsTable
           ENV : !Ref Env
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
   
   # DownloadResumeLambda:
