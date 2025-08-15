@@ -49,6 +49,7 @@
   "writerSummaryPlaceholder": "Start writing to see a summary...",
   "writerTitle": "Post Title",
   "writerTitlePlaceholder": "Enter your post title",
+  "writerTitleRequired": "Title is required.",
   "writerContent": "Write your content here...",
   "witerSummaryTitle": "Auto-Generated Summary",
   "writerThumbnailTitle": "Featured Image (Thumbnail)",

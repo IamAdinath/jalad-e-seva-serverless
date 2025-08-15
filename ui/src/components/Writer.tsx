@@ -3,7 +3,7 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
-
+import { createBlog, uploadToS3 } from './apis';
 
 // Import the dedicated CSS file
 import './Writer.css';
@@ -120,20 +120,34 @@ const Writer: React.FC = () => {
       alert('Title cannot be empty.');
       return;
     }
-
+    if (!thumbnail) {
+      alert('Thumbnail is required.');
+      return;
+    }
+    if (!startDate || !endDate) {
+      alert('Start and End dates are required.');
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      alert('Start date cannot be after End date.');
+      return;
+    }
+    
+    
+    const file_url = uploadToS3(thumbnail)
     const blogPostData = {
       title,
       htmlContent: editor.getHTML(),
       textContent: editor.getText(),
-      thumbnailFile: thumbnail,
+      image: file_url,
       startDate,
       endDate,
       category,
-      status: 'draft', // or 'published'
+      status: 'published', // or 'published'
       publishDate: new Date().toISOString(),
     };
-
-    console.log("PUBLISHING DATA:", blogPostData);
+    const apiCreateBlog = createBlog(blogPostData);
+    console.log("PUBLISHING DATA:", apiCreateBlog);
     alert('Post data has been logged to the console!');
   };
 
