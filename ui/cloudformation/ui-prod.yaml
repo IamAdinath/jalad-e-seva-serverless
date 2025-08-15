@@ -63,73 +63,80 @@ Resources:
         SigningBehavior: "always"
         OriginAccessControlOriginType: "s3"
 
-  ResponseHeadersPolicy:
-    Type: AWS::CloudFront::ResponseHeadersPolicy
-    Properties:
-      ResponseHeadersPolicyConfig:
-        Name: !Sub "${ProjectName}-${Env}-header-policy"
-        Comment: Header policy for ${ProjectName} UI
-        CorsConfig:
-          OriginOverride: false
-          AccessControlAllowCredentials: false
-          AccessControlAllowHeaders:
-            Items: ["ALL"]
-          AccessControlAllowMethods:
-            Items: ["POST", "GET", "OPTIONS", "DELETE"]
-          AccessControlAllowOrigins:
-            Items: [!Ref Hostname]
-          AccessControlExposeHeaders:
-            Items: ["ALL"]
-          AccessControlMaxAgeSec: 3600
-        RemoveHeadersConfig:
-          Items:
-            - Header: server
-        ServerTimingHeadersConfig:
-          Enabled: true
-          SamplingRate: 50
-        SecurityHeadersConfig:
-          StrictTransportSecurity:
-            AccessControlMaxAgeSec: 31536000
-            Override: true
-          ContentTypeOptions:
-            Override: true
-          FrameOptions:
-            FrameOption: SAMEORIGIN
-            Override: true
-          ReferrerPolicy:
-            Override: true
-            ReferrerPolicy: strict-origin-when-cross-origin
-          XSSProtection:
-            Override: true
-            Protection: true
-          ContentSecurityPolicy:
-            ContentSecurityPolicy: !Sub >
-              img-src 'self';
-              script-src ${Hostname} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk=';
-              style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
-              object-src 'self';
-            Override: true
+  # ResponseHeadersPolicy:
+  #   Type: AWS::CloudFront::ResponseHeadersPolicy
+  #   Properties:
+  #     ResponseHeadersPolicyConfig:
+  #       Name: !Sub "${ProjectName}-${Env}-header-policy"
+  #       Comment: Header policy for ${ProjectName} UI
+  #       CorsConfig:
+  #         OriginOverride: false
+  #         AccessControlAllowCredentials: false
+  #         AccessControlAllowHeaders:
+  #           Items: ["ALL"]
+  #         AccessControlAllowMethods:
+  #           Items: ["POST", "GET", "OPTIONS", "DELETE"]
+  #         AccessControlAllowOrigins:
+  #           Items: [!Ref Hostname]
+  #         AccessControlExposeHeaders:
+  #           Items: ["ALL"]
+  #         AccessControlMaxAgeSec: 3600
+  #       RemoveHeadersConfig:
+  #         Items:
+  #           - Header: server
+  #       ServerTimingHeadersConfig:
+  #         Enabled: true
+  #         SamplingRate: 50
+  #       SecurityHeadersConfig:
+  #         StrictTransportSecurity:
+  #           AccessControlMaxAgeSec: 31536000
+  #           Override: true
+  #         ContentTypeOptions:
+  #           Override: true
+  #         FrameOptions:
+  #           FrameOption: SAMEORIGIN
+  #           Override: true
+  #         ReferrerPolicy:
+  #           Override: true
+  #           ReferrerPolicy: strict-origin-when-cross-origin
+  #         XSSProtection:
+  #           Override: true
+  #           Protection: true
+  #         ContentSecurityPolicy:
+  #           ContentSecurityPolicy: !Sub >
+  #             img-src 'self';
+  #             script-src ${Hostname} 'sha256-UR0iHsZVfsKqSr7yAVEyYw7qoSY2X0JnEIXNLstrEwk=';
+  #             style-src 'self' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
+  #             object-src 'self';
+  #           Override: true
 
   ReactAppCDN:
     Type: "AWS::CloudFront::Distribution"
     Properties:
       DistributionConfig:
         Enabled: true
+        Comment: !Sub "CloudFront for ${ProjectName} UI"
         DefaultRootObject: "index.html"
         Origins:
           - DomainName: !Sub "${jaladUIBucket}.s3.amazonaws.com"
             Id: !Ref jaladUIBucket
             S3OriginConfig:
-              OriginAccessIdentity: ""
-            OriginAccessControlId: !Ref CloudFrontOAC
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
         DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: !Ref UIBucket
           ForwardedValues:
             QueryString: false
-            Cookies: {Forward: "none"}
-            Headers: ["Origin"]
-          TargetOriginId: !Ref jaladUIBucket
-          ViewerProtocolPolicy: "redirect-to-https"
-          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           AcmCertificateArn: !Ref SSLCertArn
           SslSupportMethod: sni-only
