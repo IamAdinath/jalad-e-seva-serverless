@@ -398,12 +398,18 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AmazonS3FullAccess
       Events:
-        AddItem:
+        uploadToS3Post:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /upload-to-s3
             Method: POST
+        uploadToS3Options:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /upload-to-s3
+            Method: OPTIONS
       Environment:
         Variables:
           MEDIA_BUCKET: !Ref MediaBucket
