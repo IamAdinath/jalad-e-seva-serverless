@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from requests_toolbelt.multipart import decoder
 import boto3
 from common.s3 import put_s3_file
-from common.responses import build_response
+from common.utils import build_response
 from common.constants import StatusCodes, Headers
 
 logger = logging.getLogger()
@@ -24,15 +24,27 @@ def lambda_handler(event, context):
         if not BLOGS_TABLE or not S3_BUCKET:
             return build_response(
                 StatusCodes.INTERNAL_SERVER_ERROR,
-                Headers.CORS,
+                Headers.INTERNAL_SERVER_ERRORS,
                 {"message": "Environment variables BLOGS_TABLE or BLOG_IMAGES_BUCKET not set."},
             )
 
         logger.info(f"Received event: {event}")
 
-        # Decode body if base64 encoded
+        # Get content-type header
         content_type = event["headers"].get("Content-Type") or event["headers"].get("content-type")
-        body_bytes = base64.b64decode(event["body"]) if event.get("isBase64Encoded") else event["body"]
+        if not content_type:
+            return build_response(
+                StatusCodes.BAD_REQUEST,
+                Headers.BAD_REQUEST,
+                {"message": "Missing Content-Type header."},
+            )
+
+        # Ensure body is bytes
+        if event.get("isBase64Encoded"):
+            body_bytes = base64.b64decode(event["body"])
+        else:
+            # Convert string body to bytes explicitly
+            body_bytes = event["body"].encode() if isinstance(event["body"], str) else event["body"]
 
         # Parse multipart form-data
         multipart_data = decoder.MultipartDecoder(body_bytes, content_type)
@@ -40,12 +52,15 @@ def lambda_handler(event, context):
         files = []
 
         for part in multipart_data.parts:
-            content_disp = part.headers[b'Content-Disposition'].decode()
+            content_disp = part.headers[b"Content-Disposition"].decode()
             if "filename=" in content_disp:
                 files.append(part.content)
             else:
-                field_name = content_disp.split('name=')[1].strip('"')
-                fields[field_name] = part.text
+                # Extract the name field safely
+                name_token = [token for token in content_disp.split(";") if "name=" in token]
+                if name_token:
+                    field_name = name_token[0].split("=")[1].strip('" ')
+                    fields[field_name] = part.text
 
         # Extract form fields
         title = fields.get("title")
@@ -60,7 +75,7 @@ def lambda_handler(event, context):
             logger.error(f"Invalid Title: {title} or Content: {content}")
             return build_response(
                 StatusCodes.BAD_REQUEST,
-                Headers.CORS,
+                Headers.BAD_REQUEST,
                 {"message": "Title and content are required."},
             )
 
@@ -69,13 +84,20 @@ def lambda_handler(event, context):
 
         # Upload files to S3
         image_urls = []
+        if not files:
+            return build_response(
+                StatusCodes.BAD_REQUEST,
+                Headers.BAD_REQUEST,
+                {"message": "No files provided."},
+            )
+        
         for idx, file_content in enumerate(files):
             s3_key = f"blogs/{blog_id}-{idx}"
             uploaded = put_s3_file(S3_BUCKET, s3_key, file_content)
             if not uploaded:
                 return build_response(
                     StatusCodes.INTERNAL_SERVER_ERROR,
-                    Headers.CORS,
+                    Headers.INTERNAL_SERVER_ERROR,
                     {"message": f"Failed to upload file index {idx} to S3."},
                 )
             image_urls.append(f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}")
@@ -105,21 +127,21 @@ def lambda_handler(event, context):
             "updatedAt": now
         }
         if ttl_value:
-            item["ttl"] = ttl_value  # DynamoDB TTL field
+            item["ttl"] = ttl_value
 
         table = dynamodb.Table(BLOGS_TABLE)
         table.put_item(Item=item)
 
         return build_response(
             StatusCodes.CREATED,
-            Headers.CORS,
+            Headers.DEFAULT,
             {"message": "Blog created successfully.", "blog_id": blog_id, "images": image_urls},
         )
 
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Error: {e}", exc_info=True)
         return build_response(
             StatusCodes.INTERNAL_SERVER_ERROR,
-            Headers.CORS,
+            Headers.INTERNAL_SERVER_ERROR,
             {"message": "Failed to create blog."},
         )
