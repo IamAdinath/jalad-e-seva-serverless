@@ -5,7 +5,8 @@ import { baseHeaders, apiEndpoints } from './constants';
 import { 
   type CreateBlogPost, 
   type APIErrorResponse, 
-  type CreateBlogPostSuccessResponse 
+  type CreateBlogPostSuccessResponse,
+  type BlogPost
 } from './types';
 
 export function uploadToS3(file: File): Promise<string> {
@@ -53,4 +54,23 @@ export function createBlog(postData: CreateBlogPost): Promise<CreateBlogPostSucc
         throw error;
       });
   }
+}
+
+
+export function getBlogsbyCategory(
+  category: string
+): Promise<BlogPost[] | APIErrorResponse> {
+  return fetch(apiEndpoints.getBlogsbyCategory(category), { method: "GET" })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data && Array.isArray(data.blogs)) {
+        return data.blogs as BlogPost[];
+      } else {
+        throw new Error("Invalid response format: 'blogs' not found");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching blogs by category:", error);
+      return Promise.reject({ error: "Failed to fetch blogs by category" });
+    });
 }
