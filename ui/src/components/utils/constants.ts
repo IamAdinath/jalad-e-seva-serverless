@@ -1,6 +1,5 @@
 
 export const baseUrl = import.meta.env.VITE_API_URL; 
-
 export const baseHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -27,5 +26,5 @@ export const apiEndpoints = {
   updateCategory: (id: string) => `${baseUrl}/categories/${id}`,
   deleteCategory: (id: string) => `${baseUrl}/categories/${id}`,
   getBlogsbyStatus: (status: string) => `${baseUrl}/blogs?status=${status}`,
-  getBlogsbyCategory: (category: string) => `${baseUrl}/blogs?category=${category}`,
+  getBlogsbyCategory: (category: string) => `${baseUrl}/get-blogs-by-category?category=${category}`,
 };
