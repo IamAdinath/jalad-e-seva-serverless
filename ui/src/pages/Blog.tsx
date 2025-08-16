@@ -1,40 +1,76 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import BlogList from "../components/BlogList";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import type { BlogPost } from "../components/utils/types";
-import { getBlogbyId } from "../components/utils/apis";
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-const Blog: React.FC = () => {
+// Assuming these are imported from your project files
+import { getBlogbyId } from '../components/utils/apis';
+import type { BlogPost, APIErrorResponse } from '../components/utils/types';
+import Header from '../components/Header';
+import BlogReader from '../components/ReadBlog';
+import Footer from '../components/Footer';
+
+const Blog = () => {
   const { id } = useParams<{ id: string }>();
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+
+  // State for the blog post
+  const [blog, setBlog] = useState<BlogPost | undefined>(undefined);
+  // NEW: State to hold any error messages
+  const [error, setError] = useState<string | null>(null);
+  // State for loading status
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-
-    setLoading(true);
-    getBlogbyId(id)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setBlogs(data);
-        } else {
-          console.error("Error fetching blogs:", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching blogs:", error);
-      })
-      .finally(() => {
+    const fetchBlog = async () => {
+      if (!id) {
         setLoading(false);
-      });
-  }, [id]); // dependency array to re-run on category change
+        setError("No blog ID provided.");
+        return;
+      }
 
+      setLoading(true);
+      setError(null); // Reset previous errors
+      const fetchedBlog = await getBlogbyId(id); 
+      
+      // --- THIS IS THE CRITICAL FIX ---
+      // We now check the shape of the response to see if it's an error.
+      // This is called a "type guard".
+      if ('error' in fetchedBlog) {
+        // It's an APIErrorResponse
+        setError(fetchedBlog.error);
+        setBlog(undefined); // Ensure no old blog data is shown
+      } else {
+        // It's a successful BlogPost
+        setBlog(fetchedBlog);
+      }
+      
+      setLoading(false);
+    };
+
+    fetchBlog();
+  }, [id]);
+
+  // --- NEW: Render an error message if one exists ---
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="reader-status-container">
+            <h2>Error Fetching Blog</h2>
+            <p>{error}</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Your existing render logic for loading and success states
   return (
     <>
       <Header />
-      <BlogList blogs={blogs} loading={loading} />
+      {/* 
+        The BlogReader component will now correctly show its own 
+        loading/not-found message based on these props.
+      */}
+      <BlogReader blog={blog} loading={loading} />
       <Footer />
     </>
   );
