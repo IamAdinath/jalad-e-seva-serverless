@@ -1,5 +1,5 @@
 
-export const baseUrl = import.meta.env.VITE_API_URL; 
+export const baseUrl = import.meta.env.VITE_API_URL;
 export const baseHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -15,7 +15,7 @@ export const authHeaders = {
 
 export const apiEndpoints = {
   getPosts: `${baseUrl}/posts`,
-  getPostById: (id: string) => `${baseUrl}/posts/${id}`,
+  getPostById: (id: string) => `${baseUrl}/get-blog-by-id?id=${id}`,
   createPost: `${baseUrl}/create-blog`,
   updatePost: (id: string) => `${baseUrl}/posts/${id}`,
   deletePost: (id: string) => `${baseUrl}/posts/${id}`,

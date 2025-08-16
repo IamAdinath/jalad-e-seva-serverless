@@ -78,7 +78,7 @@ export function getBlogsbyCategory(
 export function getBlogbyId(
   id: string
 ): Promise<BlogPost | APIErrorResponse> {
-  return fetch(apiEndpoints.getPostById(id), { method: "GET" })
+  return fetch(apiEndpoints.getPostById(id), { method: "GET"})
     .then((res) => res.json())
     .then((data) => {
       if (data && data.post) {
