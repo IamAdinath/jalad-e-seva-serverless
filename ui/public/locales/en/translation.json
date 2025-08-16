@@ -33,6 +33,8 @@
   "navLogout": "Logout",
   "navProfile": "Profile",
   "navLanguage": "Language",
+  "NoBlogsFound": "No blogs found for this category.",
+  "NoBlogsFoundDescription": "Please check back later or explore other categories.",
   
   "featureServicesWeOffer": "Services We Offer",
   "featureServicesWeOfferDescription": "We provide a wide range of government services to cater to your needs.",
