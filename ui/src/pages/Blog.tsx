@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 // Assuming these are imported from your project files
 import { getBlogbyId } from '../components/utils/apis';
-import type { BlogPost, APIErrorResponse } from '../components/utils/types';
+import type { BlogPost } from '../components/utils/types';
 import Header from '../components/Header';
 import BlogReader from '../components/ReadBlog';
 import Footer from '../components/Footer';
