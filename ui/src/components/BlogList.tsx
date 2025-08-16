@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { apiEndpoints, baseUrl } from "./utils/constants";
+import { apiEndpoints } from "./utils/constants";
 
 interface BlogPost {
   id: string;
@@ -24,7 +24,7 @@ const BlogList: React.FC = () => {
     if (!category) return;
     setLoading(true);
 
-    fetch(`${baseUrl}/blogs?category=${category}`)
+    fetch(`${apiEndpoints}`)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data || []);
