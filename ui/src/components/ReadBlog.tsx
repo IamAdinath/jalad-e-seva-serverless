@@ -54,7 +54,7 @@ const BlogReader: React.FC<BlogReaderProps> = ({ blog, loading = false }) => {
 
       <div
         className="blog-content"
-        dangerouslySetInnerHTML={{ __html: blog.htmlContent }}
+        dangerouslySetInnerHTML={{ __html: blog?.htmlContent ?? "" }}
       />
     </article>
   );
