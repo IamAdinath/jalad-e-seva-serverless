@@ -35,6 +35,8 @@
   "navLogout": "लॉग आउट करा",
   "navProfile": "प्रोफाइल",
   "navLanguage": "भाषा",
+  "NoBlogsFound": "या श्रेणीसाठी कोणतेही ब्लॉग सापडले नाही.",
+  "NoBlogsFoundDescription": "कृपया नंतर पुन्हा तपासा किंवा इतर श्रेणींचा शोध घ्या.",
 
   "featureServicesWeOffer": "आमच्या सेवा",
   "featureServicesWeOfferDescription": "नागरिकांसाठी सुलभ, पारदर्शक आणि कार्यक्षम सुविधा देण्यासाठी आम्ही सर्वसमावेशक सरकारी सेवा उपलब्ध करून देतो.",
