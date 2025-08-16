@@ -5,7 +5,7 @@ import Features from "../components/Features";
 import Footer from "../components/Footer";
 import UpdatesMarquee from "../components/UpdatesMarquee";
 import Header from "../components/Header";
-import BlogList from "../components/BlogList";
+// import BlogList from "../components/BlogList";
 
 const Home: React.FC = () => {
   const latestUpdates = [
@@ -22,7 +22,7 @@ const Home: React.FC = () => {
       <Banner />
       <UpdatesMarquee updates={latestUpdates} />
       <Features />
-      <BlogList />
+      {/* <BlogList /> */}
       <Footer />
     </>
   );

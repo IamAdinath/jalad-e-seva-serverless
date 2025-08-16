@@ -1,21 +1,40 @@
-import React from "react";
-import Footer from "../components/Footer";
-// import UpdatesMarquee from "../components/UpdatesMarquee";
-import Header from "../components/Header";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import BlogList from "../components/BlogList";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import type { BlogPost } from "../components/utils/types";
+import { getBlogsbyCategory } from "../components/utils/apis";
 
 const CategoryBlogs: React.FC = () => {
-//   const latestUpdates = [
-//   "New scholarship programs for 2025 have been announced.",
-//   "The deadline for agricultural loan applications is approaching.",
-//   "Public transport services will be updated starting next month.",
-//   "Check your eligibility for the new housing scheme now."
-// ];
+  const { category } = useParams<{ category: string }>();
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!category) return;
+
+    setLoading(true);
+    getBlogsbyCategory(category)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBlogs(data);
+        } else {
+          console.error("Error fetching blogs:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching blogs:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [category]); // dependency array to re-run on category change
 
   return (
     <>
       <Header />
-      <BlogList />
+      <BlogList blogs={blogs} loading={loading} />
       <Footer />
     </>
   );

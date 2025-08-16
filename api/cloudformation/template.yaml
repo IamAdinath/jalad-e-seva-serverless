@@ -347,6 +347,61 @@ Resources:
           ENV : !Ref Env
           BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
+  GetBlogsByCategoryLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub get-blogs-by-category-${ProjectName}-${Env}
+      Handler: blogs.get_by_category.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        getBlogsByCategoryPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs-by-category
+            Method: GET
+        getBlogsByCategoryOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs-by-category
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
+
+  GetBlogByIdLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub get-blog-by-id-${ProjectName}-${Env}
+      Handler: blogs.get_by_id.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        getBlogByIdPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blog-by-id
+            Method: GET
+        getBlogByIdOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blog-by-id
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
+
+
   
   # DownloadResumeLambda:
   #   Type: AWS::Serverless::Function
