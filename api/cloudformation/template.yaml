@@ -259,15 +259,15 @@ Resources:
       Name: !Sub API-${ProjectName}-${Env}
       StageName: !Ref Env
       Cors:
-        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
-      Auth:
-        Authorizers:
-          CognitoAuth:
-            UserPoolArn: !GetAtt BlogUserPool.Arn
-            Identity:
-              Header: Authorization
+        AllowMethods: OPTIONS,GET,POST,PUT,DELETE
+        AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
+        AllowOrigin: "*"
+      # Auth:
+      #   Authorizers:
+      #     CognitoAuth:
+      #       UserPoolArn: !GetAtt BlogUserPool.Arn
+      #       Identity:
+      #         Header: Authorization
 
   ConfirmUserLambda:
     Type: AWS::Serverless::Function
@@ -279,12 +279,18 @@ Resources:
         - AmazonDynamoDBFullAccess
         - AmazonCognitoPowerUser
       Events:
-        AddItem:
+        confirmUserPost:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /confirm-user
             Method: POST
+        confirmUserOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /confirm-user
+            Method: OPTIONS
       Environment:
         Variables:
           USERS_TABLE: !Ref UsersTable
@@ -319,8 +325,9 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
       Events:
-        AddItem:
+        createBlogPost:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
@@ -328,10 +335,17 @@ Resources:
             Method: POST
             # Auth:
             #   Authorizer: CognitoAuth
+        createBlogOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /create-blog
+            Method: OPTIONS
       Environment:
         Variables:
           BLOGS_TABLE: !Ref BlogsTable
           ENV : !Ref Env
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
   
   # DownloadResumeLambda:
@@ -384,12 +398,18 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AmazonS3FullAccess
       Events:
-        AddItem:
+        uploadToS3Post:
           Type: Api
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /upload-to-s3
             Method: POST
+        uploadToS3Options:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /upload-to-s3
+            Method: OPTIONS
       Environment:
         Variables:
           MEDIA_BUCKET: !Ref MediaBucket
