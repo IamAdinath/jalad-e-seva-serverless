@@ -1,21 +1,6 @@
 
 
-const baseUrl = 'https://yinnvrppse.execute-api.ap-south-1.amazonaws.com/dev';
-const baseHeaders = {
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true',
-};
-const apiEndpoints = {
-  getPosts: `${baseUrl}/posts`,
-  getPostById: (id: string) => `${baseUrl}/posts/${id}`,
-  createPost: `${baseUrl}/create-post`,
-  updatePost: (id: string) => `${baseUrl}/posts/${id}`,
-  deletePost: (id: string) => `${baseUrl}/posts/${id}`,
-  uploadToS3: `${baseUrl}/upload-to-s3`,
-};
+import { baseHeaders, apiEndpoints } from './constants';
 
 import { 
   type CreateBlogPost, 
@@ -60,7 +45,6 @@ export function createBlog(postData: CreateBlogPost): Promise<CreateBlogPostSucc
   } else {
     return fetch(apiEndpoints.createPost, {
       method: "POST",
-      headers: baseHeaders,
       body: JSON.stringify(postData),
     })
       .then(response => response.json())
