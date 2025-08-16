@@ -362,7 +362,7 @@ Resources:
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /get-blogs-by-category
-            Method: POST
+            Method: GET
         getBlogsByCategoryOptions:
           Type: Api
           Properties:
@@ -389,7 +389,7 @@ Resources:
           Properties:
             RestApiId: !Ref jaladAPI
             Path: /get-blog-by-id
-            Method: POST
+            Method: GET
         getBlogByIdOptions:
           Type: Api
           Properties:
