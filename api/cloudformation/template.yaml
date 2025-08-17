@@ -22,29 +22,29 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
-        - AttributeName: author
+        - AttributeName: status
           AttributeType: S
         - AttributeName: published_at
           AttributeType: S
-        - AttributeName: status
+        - AttributeName: category
           AttributeType: S
       KeySchema:
         - AttributeName: id
           KeyType: HASH
       GlobalSecondaryIndexes:
-        - IndexName: author_index
-          KeySchema:
-            - AttributeName: author
-              KeyType: HASH
-            - AttributeName: published_at
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
         - IndexName: status_published_at
           KeySchema:
             - AttributeName: status
               KeyType: HASH
             - AttributeName: published_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: status_category
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: category
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
