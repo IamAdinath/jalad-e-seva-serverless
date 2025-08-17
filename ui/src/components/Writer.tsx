@@ -3,29 +3,21 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
-import { createBlog } from './utils/apis';
-
-// Import the dedicated CSS file
+import { createBlog, uploadToS3 } from './utils/apis';
 import './Writer.css';
 
-// --- MenuBar Component for Toolbar (CORRECTED) ---
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null;
   }
 
-  // This helper function now correctly builds the command chain on click
   const createMenuButton = (
-    // The 'action' now directly corresponds to the Tiptap command, e.g., "toggleBold"
     commandName: string,
-    // 'name' is used for the isActive check, e.g., "bold"
     activeName: string,
     icon: React.ReactNode,
     label: string,
     params?: any
   ) => {
-    // The command chain is now created and run directly inside the onClick handler.
-    // This ensures it's always fresh and targets the current editor state.
     const action = () => (editor.chain().focus() as any)[commandName](params).run();
 
     return (
@@ -34,7 +26,6 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         onClick={action}
         className={editor.isActive(activeName, params) ? 'is-active' : ''}
         title={label}
-        // Disable button if the command cannot be executed
         disabled={!(editor.can() as any)[commandName](params)}
       >
         {icon}
@@ -55,12 +46,9 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 };
 
 
-// --- The Main Writer Component (No other logic changes needed here) ---
 const Writer: React.FC = () => {
-  // Using a mock t function if i18next is not set up.
-  // Replace with: const { t, i18n } = useTranslation();
+
   const {t} =  useTranslation();
-  // State for all form fields
   const [title, setTitle] = useState('');
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -68,7 +56,6 @@ const Writer: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [category, setCategory] = useState('general');
 
-  // Tiptap editor instance
   const editor = useEditor({
     extensions: [
       StarterKit.configure(),
@@ -79,7 +66,6 @@ const Writer: React.FC = () => {
     content: '',
   });
 
-  // Effect to update placeholder on language change
   useEffect(() => {
     if (editor) {
       editor.extensionManager.extensions.find(
@@ -89,7 +75,6 @@ const Writer: React.FC = () => {
     }
   }, [editor, t]);
 
-  // Handles file selection and creates a preview URL
   const handleFileChange = useCallback((file: File | null) => {
     if (file) {
       if (previewUrl) {
@@ -101,7 +86,6 @@ const Writer: React.FC = () => {
     }
   }, [previewUrl]);
 
-  // Handles drag-and-drop functionality
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.currentTarget.classList.remove('is-dragging-over');
@@ -110,7 +94,6 @@ const Writer: React.FC = () => {
     }
   }, [handleFileChange]);
 
-  // Placeholder for publishing logic
   const handlePublish = () => {
     if (!editor || editor.getText().trim() === '') {
       alert('Content cannot be empty.');
@@ -220,6 +203,9 @@ const Writer: React.FC = () => {
       </div>
 
       <footer className="writer-footer">
+        <button type="button" onClick={handlePublish} className="draft-button">
+          {t('writerDraft')}
+        </button>
         <button type="button" onClick={handlePublish} className="publish-button">
           {t('writerPublish')}
         </button>
