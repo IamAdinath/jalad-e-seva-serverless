@@ -1,6 +1,8 @@
 
 
 import { baseHeaders, apiEndpoints } from './constants';
+import type { DefaultResponse } from './types';
+import { fileToBase64} from './common';
 
 import { 
   type CreateBlogPost, 
@@ -9,50 +11,58 @@ import {
   type BlogPost
 } from './types';
 
-export function uploadToS3(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append('file_name', file);
-  return fetch(apiEndpoints.uploadToS3, {
-    headers: baseHeaders,
-    method: 'POST',
-    body: formData,
-  })
-    .then(response => response.json())
-    .then(data => data.url)
-    .catch(error => {
-      console.error('Error uploading thumbnail:', error);
-      throw error;
-    });
-} 
+export async function uploadToS3(
+  filename: string,
+  file: File
+): Promise<DefaultResponse | APIErrorResponse> {
+  
+  try {
+    const base64Data = await fileToBase64(file, true);
+    const payload = {
+      file: base64Data,
+      filename: filename,
+      contentType: file.type,
+    };
 
-export function createBlog(postData: CreateBlogPost): Promise<CreateBlogPostSuccessResponse | APIErrorResponse> {
-  const hasFile = postData.image instanceof File;
-
-  if (hasFile) {
-    const formData = new FormData();
-    Object.entries(postData).forEach(([key, value]) => {
-      formData.append(key, value as any);
+    const response = await fetch(apiEndpoints.uploadToS3, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
 
-    return fetch(apiEndpoints.createPost, {
-      method: "POST",
-      body: formData,
-    })
-      .then(response => response.json())
-      .catch(error => {
-        console.error("Error creating blog post:", error);
-        throw error;
-      });
-  } else {
-    return fetch(apiEndpoints.createPost, {
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Image upload failed with status ${response.status}`);
+    }
+
+    const successData: DefaultResponse = await response.json();
+    return successData;
+
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return {error: (error as Error).message, status: 'error'} as APIErrorResponse;
+  }
+}
+
+export async function createBlog(
+  postData: CreateBlogPost
+): Promise<CreateBlogPostSuccessResponse | APIErrorResponse> {
+  try {
+    const response = await fetch(apiEndpoints.createPost, {
       method: "POST",
       body: JSON.stringify(postData),
-    })
-      .then(response => response.json())
-      .catch(error => {
-        console.error("Error creating blog post:", error);
-        throw error;
-      });
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    }
+
+    const successData: CreateBlogPostSuccessResponse = await response.json();
+    return successData;
+
+  } catch (error) {
+    console.error("Error creating blog post:", error);
+    return {error: (error as Error).message, status: 'error'} as APIErrorResponse;
   }
 }
 

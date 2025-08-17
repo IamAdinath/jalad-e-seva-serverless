@@ -3,7 +3,7 @@ export interface CreateBlogPost {
     title: string;
     htmlContent: string;
     contentSummary: string;
-    image: File | string; // File or URL
+    imageType: string; 
     startDate: string;
     endDate: string;
     category?: string;
@@ -41,3 +41,7 @@ export interface BlogPost {
     category?: string;
 }
 
+export interface DefaultResponse {
+    status: string;
+    message: string;
+}

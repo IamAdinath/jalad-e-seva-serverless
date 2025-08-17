@@ -44,12 +44,12 @@ def lambda_handler(event, context):
         summary = payload.get("contentSummary")
         startDate = payload.get("startDate")
         endDate = payload.get("endDate")
+        imageType = payload.get("imageType")
         category = payload.get("category")
-        image_urls = payload.get("image")
         blog_status = payload.get("status", "published")
 
-        if not title or not content or not image_urls:
-            logger.error(f"Invalid Title: {title} or Content: {content} or Images: {image_urls}")
+        if not title or not content or not imageType:
+            logger.error(f"Invalid Title: {title} or Content: {content} or Images: {imageType}")
             return build_response(
                 StatusCodes.BAD_REQUEST,
                 Headers.BAD_REQUEST,
@@ -76,7 +76,7 @@ def lambda_handler(event, context):
             "endDate": endDate,
             "category": category,
             "status": blog_status,
-            "image": image_urls,
+            "image": f"{blog_id}{imageType}",
             "createdAt": now,
             "updatedAt": now,
             "statusCategory": f"{blog_status}-{category}",

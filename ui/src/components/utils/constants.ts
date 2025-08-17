@@ -1,5 +1,6 @@
 
-export const baseUrl = import.meta.env.VITE_API_URL;
+// export const baseUrl = import.meta.env.VITE_API_URL;
+export const baseUrl = 'https://mt1vak2utb.execute-api.ap-south-1.amazonaws.com/dev'; 
 export const baseHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
