@@ -74,3 +74,21 @@ export function getBlogsbyCategory(
       return Promise.reject({ error: "Failed to fetch blogs by category" });
     });
 }
+
+export function getBlogbyId(
+  id: string
+): Promise<BlogPost | APIErrorResponse> {
+  return fetch(apiEndpoints.getPostById(id), { method: "GET"})
+    .then((res) => res.json())
+    .then((data) => {
+      if (data && data.post) {
+        return data.post as BlogPost;
+      } else {
+        throw new Error("Invalid response format: 'post' not found");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching blog by ID:", error);
+      return Promise.reject({ error: "Failed to fetch blog by ID" });
+    });
+}

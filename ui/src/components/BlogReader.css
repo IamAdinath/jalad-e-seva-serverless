@@ -1,0 +1,110 @@
+/*
+  BlogReader.css
+  Styles for a clean, single-post article reader.
+*/
+
+/* --- Main Container --- */
+.blog-reader-container {
+  max-width: 800px; /* Optimal reading width */
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* --- Header Styling (Title & Metadata) --- */
+.blog-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.blog-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-color, #212529);
+  margin: 0 0 20px 0;
+}
+
+.blog-meta {
+  font-size: 0.95rem;
+  color: var(--text-light, #6c757d);
+}
+
+.blog-meta .separator {
+  margin: 0 10px;
+}
+
+/* --- Featured Image --- */
+.featured-image {
+  margin: 0 0 40px 0;
+  width: 100%;
+}
+
+.featured-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Main Blog Content --- */
+/* This is crucial for making the rendered HTML look good */
+.blog-content {
+  font-size: 1.1rem; /* A comfortable reading size */
+  line-height: 1.7;  /* Generous line spacing for readability */
+  color: var(--text-color-secondary, #343a40);
+}
+
+/* Spacing between paragraphs */
+.blog-content p {
+  margin-bottom: 1.5em;
+}
+
+/* Styling for headings inside the article */
+.blog-content h2,
+.blog-content h3 {
+  font-weight: 600;
+  margin-top: 2.5em;
+  margin-bottom: 1em;
+  line-height: 1.3;
+  color: var(--text-color, #212529);
+}
+
+.blog-content h2 { font-size: 1.8rem; }
+.blog-content h3 { font-size: 1.5rem; }
+
+/* Styling for lists */
+.blog-content ul,
+.blog-content ol {
+  padding-left: 25px;
+  margin-bottom: 1.5em;
+}
+
+.blog-content li {
+  margin-bottom: 0.75em;
+}
+
+/* Styling for links inside the article */
+.blog-content a {
+  color: var(--primary-color, #007bff);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.blog-content a:hover {
+  color: var(--primary-hover-color, #0056b3);
+}
+
+/* Styling for blockquotes */
+.blog-content blockquote {
+  margin: 2em 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--primary-color, #007bff);
+  font-style: italic;
+  color: var(--text-light, #6c757d);
+}
+
+/* --- Loading / Not Found States --- */
+.reader-status-container {
+  text-align: center;
+  padding: 100px 20px;
+  color: var(--text-light, #6c757d);
+}
