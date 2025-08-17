@@ -76,7 +76,7 @@ def lambda_handler(event, context):
             "endDate": endDate,
             "category": category,
             "status": blog_status,
-            "images": image_urls,
+            "image": image_urls,
             "createdAt": now,
             "updatedAt": now,
             "statusCategory": f"{blog_status}-{category}",
