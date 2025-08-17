@@ -14,40 +14,40 @@ Globals:
 
 Resources:
 
-  BlogsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub Posts-${ProjectName}-${Env}
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-        - AttributeName: status
-          AttributeType: S
-        - AttributeName: published_at
-          AttributeType: S
-        - AttributeName: category
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      GlobalSecondaryIndexes:
-        - IndexName: status_published_at
-          KeySchema:
-            - AttributeName: status
-              KeyType: HASH
-            - AttributeName: published_at
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-        - IndexName: status_category
-          KeySchema:
-            - AttributeName: status
-              KeyType: HASH
-            - AttributeName: category
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
+  # BlogsTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: !Sub ${ProjectName}-${Env}-Posts
+  #     BillingMode: PAY_PER_REQUEST
+  #     AttributeDefinitions:
+  #       - AttributeName: id
+  #         AttributeType: S
+  #       - AttributeName: status
+  #         AttributeType: S
+  #       - AttributeName: publishedAt
+  #         AttributeType: S
+  #       - AttributeName: category
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: id
+  #         KeyType: HASH
+  #     GlobalSecondaryIndexes:
+  #       - IndexName: statusPublishedAtIndex
+  #         KeySchema:
+  #           - AttributeName: status
+  #             KeyType: HASH
+  #           - AttributeName: publishedAt
+  #             KeyType: RANGE
+  #         Projection:
+  #           ProjectionType: ALL
+  #       - IndexName: statusCategoryIndex
+  #         KeySchema:
+  #           - AttributeName: status
+  #             KeyType: HASH
+  #           - AttributeName: category
+  #             KeyType: RANGE
+  #         Projection:
+  #           ProjectionType: ALL
 
   CommentsTable:
     Type: AWS::DynamoDB::Table
@@ -343,7 +343,7 @@ Resources:
             Method: OPTIONS
       Environment:
         Variables:
-          BLOGS_TABLE: !Ref BlogsTable
+          # BLOGS_TABLE: !Ref BlogsTable
           ENV : !Ref Env
           BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
@@ -371,7 +371,7 @@ Resources:
             Method: OPTIONS
       Environment:
         Variables:
-          BLOGS_TABLE: !Ref BlogsTable
+          # BLOGS_TABLE: !Ref BlogsTable
           BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
   GetBlogByIdLambda:
@@ -398,7 +398,7 @@ Resources:
             Method: OPTIONS
       Environment:
         Variables:
-          BLOGS_TABLE: !Ref BlogsTable
+          # BLOGS_TABLE: !Ref BlogsTable
           BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
 
