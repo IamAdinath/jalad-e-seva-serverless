@@ -51,7 +51,7 @@ def lambda_handler(event, context):
             "id": blog.get("id"),
             "title": blog.get("title"),
             "summary": blog.get("content"),
-            "image": get_s3_file_url(S3_BUCKET, blog.get("images")[0]),
+            "image": get_s3_file_url(S3_BUCKET, blog.get("image")),
             "htmlContent": blog.get("content"),
             "textContent": "",
             "startDate": blog.get("startDate"),
