@@ -38,7 +38,9 @@ def lambda_handler(event, context):
 
         # Fetch blog from DynamoDB
         table = dynamodb.Table(BLOGS_TABLE)
-        response = table.get_item(Key={"id": blog_id})        
+        logger.info(f"Table: query ing table - {table}")
+        response = table.get_item(Key={"id": blog_id})  
+        logger.info(f"Table: query response - {response}")      
         blog = response.get("Item")
         if not blog:
             return build_response(
@@ -46,12 +48,14 @@ def lambda_handler(event, context):
                 Headers.NOT_FOUND,
                 {"message": "Blog not found."},
             )
-        
+        image = ""
+        if blog.get("image"):
+            image = get_s3_file_url(S3_BUCKET, blog["image"])
         formatted_blog = {
             "id": blog.get("id"),
             "title": blog.get("title"),
             "summary": blog.get("content"),
-            "image": get_s3_file_url(S3_BUCKET, blog.get("image")),
+            "image": image,
             "htmlContent": blog.get("content"),
             "textContent": "",
             "startDate": blog.get("startDate"),
