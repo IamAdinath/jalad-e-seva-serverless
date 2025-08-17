@@ -49,46 +49,46 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-  # BlogUserPool:
-  #   Type: AWS::Cognito::UserPool
-  #   Properties:
-  #     UserPoolName: !Sub blog-user-pool-${ProjectName}-${Env}
-  #     AutoVerifiedAttributes:
-  #       - email
-  #     AliasAttributes:
-  #       - email
-  #     Schema:
-  #       - Name: email
-  #         Required: true
-  #         Mutable: false
+  jaladUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${ProjectName}-${Env}-blog-user-pool
+      AutoVerifiedAttributes:
+        - email
+      AliasAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
 
-  # BlogUserPoolClient:
-  #   Type: AWS::Cognito::UserPoolClient
-  #   Properties:
-  #     ClientName: !Sub blog-user-client-${ProjectName}-${Env}
-  #     UserPoolId: !Ref BlogUserPool
-  #     GenerateSecret: false
-  #     AllowedOAuthFlowsUserPoolClient: true
-  #     AllowedOAuthFlows:
-  #       - code
-  #     AllowedOAuthScopes:
-  #       - email
-  #       - openid
-  #       - profile
-  #     CallbackURLs:
-  #       - http://localhost:3000/callback
-  #     LogoutURLs:
-  #       - http://localhost:3000/logout
-  #     SupportedIdentityProviders:
-  #       - COGNITO
+  jaladUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${ProjectName}-${Env}-blog-user-client
+      UserPoolId: !Ref jaladUserPool
+      GenerateSecret: false
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      CallbackURLs:
+        - http://localhost:3000/callback
+      LogoutURLs:
+        - http://localhost:3000/logout
+      SupportedIdentityProviders:
+        - COGNITO
         # - Google
 
-  # BlogGoogleIdentityProvider:
+  # jaladGoogleIdentityProvider:
   #   Type: AWS::Cognito::UserPoolIdentityProvider
   #   Properties:
   #     ProviderName: Google
   #     ProviderType: Google
-  #     UserPoolId: !Ref BlogUserPool
+  #     UserPoolId: !Ref jaladUserPool
   #     AttributeMapping:
   #       email: email
   #       username: sub
@@ -96,336 +96,294 @@ Resources:
   #       client_id: !Ref GoogleClientId
   #       authorize_scopes: email profile openid
 
-  # BlogUserGroup:
-  #   Type: AWS::Cognito::UserPoolGroup
-  #   Properties:
-  #     GroupName: user
-  #     Description: Regular blog readers and writers
-  #     UserPoolId: !Ref BlogUserPool
+  jaladUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: user
+      Description: Regular blog readers and writers
+      UserPoolId: !Ref jaladUserPool
 
-  # BlogAdminGroup:
-  #   Type: AWS::Cognito::UserPoolGroup
-  #   Properties:
-  #     GroupName: admin
-  #     Description: Admins with elevated permissions
-  #     UserPoolId: !Ref BlogUserPool
+  jaladAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admin
+      Description: Admins with elevated permissions
+      UserPoolId: !Ref jaladUserPool
 
-  # BlogIdentityPool:
-  #   Type: AWS::Cognito::IdentityPool
-  #   Properties:
-  #     IdentityPoolName: !Sub ${ProjectName}-${Env}-blog-identity-pool
-  #     AllowUnauthenticatedIdentities: false
-  #     CognitoIdentityProviders:
-  #       - ClientId: !Ref BlogUserPoolClient
-  #         ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${BlogUserPool}
+  jaladIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub ${ProjectName}-${Env}-blog-identity-pool
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId: !Ref jaladUserPoolClient
+          ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${jaladUserPool}
 
-  # BlogIdentityPoolRoleAttachment:
-  #   Type: AWS::Cognito::IdentityPoolRoleAttachment
-  #   Properties:
-  #     IdentityPoolId: !Ref BlogIdentityPool
-  #     Roles:
-  #       authenticated: !GetAtt CognitoAuthenticatedRole.Arn
+  jaladIdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref jaladIdentityPool
+      Roles:
+        authenticated: !GetAtt CognitoAuthenticatedRole.Arn
 
-  # CognitoAuthenticatedRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: !Sub ${ProjectName}-${Env}-blog-auth-role
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Federated: cognito-identity.amazonaws.com
-  #           Action: sts:AssumeRoleWithWebIdentity
-  #           Condition:
-  #             StringEquals:
-  #               cognito-identity.amazonaws.com:aud: !Ref BlogIdentityPool
-  #             "ForAnyValue:StringLike":
-  #               cognito-identity.amazonaws.com:amr: authenticated
-  #     Policies:
-  #       - PolicyName: allowDynamoAndCognito
-  #         PolicyDocument:
-  #           Version: "2012-10-17"
-  #           Statement:
-  #             - Effect: Allow
-  #               Action:
-  #                 - dynamodb:GetItem
-  #                 - dynamodb:PutItem
-  #                 - dynamodb:UpdateItem
-  #               Resource: "*"
+  CognitoAuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-${Env}-blog-auth-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref jaladIdentityPool
+              "ForAnyValue:StringLike":
+                cognito-identity.amazonaws.com:amr: authenticated
+      Policies:
+        - PolicyName: allowDynamoAndCognito
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: "*"
 
-  # UsersTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     TableName: !Sub ${ProjectName}-${Env}-users
-  #     AttributeDefinitions:
-  #       - AttributeName: user_id
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: user_id
-  #         KeyType: HASH
-  #     BillingMode: PAY_PER_REQUEST
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${ProjectName}-${Env}-users
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
 
-  # BlogUserPoolDomain:
-  #   Type: AWS::Cognito::UserPoolDomain
-  #   Properties:
-  #     Domain: !Sub ${ProjectName}-${Env}-blog-auth
-  #     UserPoolId: !Ref BlogUserPool
+  jaladUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub ${ProjectName}-${Env}-blog-auth
+      UserPoolId: !Ref jaladUserPool
 
-  # MediaBucket:
-  #   Type: "AWS::S3::Bucket"
-  #   Properties:
-  #     BucketName: !Sub ${ProjectName}-${Env}-mediabucket
-  #     CorsConfiguration:
-  #       CorsRules:
-  #         - AllowedHeaders:
-  #             - "*"
-  #           AllowedMethods:
-  #             - GET
-  #             - POST
-  #             - PUT
-  #             - DELETE
-  #           AllowedOrigins:
-  #             - "*"
-  #     BucketEncryption:
-  #       ServerSideEncryptionConfiguration:
-  #         - ServerSideEncryptionByDefault:
-  #             SSEAlgorithm: AES256
-  #     OwnershipControls:
-  #       Rules:
-  #         - ObjectOwnership: BucketOwnerPreferred
-  #     PublicAccessBlockConfiguration:
-  #       BlockPublicAcls: true
-  #       BlockPublicPolicy: true
-  #       IgnorePublicAcls: true
-  #       RestrictPublicBuckets: true
+  MediaBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub ${ProjectName}-${Env}-mediabucket
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            AllowedOrigins:
+              - "*"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
   
-  # CognitoAuth:
-  #   Type: AWS::ApiGateway::Authorizer
-  #   Properties:
-  #     Name: CognitoAuthorizer
-  #     RestApiId: !Ref jaladAPI
-  #     Type: COGNITO_USER_POOLS
-  #     IdentitySource: method.request.header.Authorization
-  #     ProviderARNs:
-  #       - !GetAtt BlogUserPool.Arn
+  CognitoAuth:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      RestApiId: !Ref jaladAPI
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      ProviderARNs:
+        - !GetAtt jaladUserPool.Arn
 
-  # jaladAPI:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: !Sub ${ProjectName}-${Env}-API
-  #     StageName: !Ref Env
-  #     Cors:
-  #       AllowMethods: OPTIONS,GET,POST,PUT,DELETE
-  #       AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
-  #       AllowOrigin: "*"
+  jaladAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${ProjectName}-${Env}-API
+      StageName: !Ref Env
+      Cors:
+        AllowMethods: OPTIONS,GET,POST,PUT,DELETE
+        AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
+        AllowOrigin: "*"
       # Auth:
       #   Authorizers:
       #     CognitoAuth:
-      #       UserPoolArn: !GetAtt BlogUserPool.Arn
+      #       UserPoolArn: !GetAtt jaladUserPool.Arn
       #       Identity:
       #         Header: Authorization
 
-  # ConfirmUserLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-confirm-user
-  #     Handler: users.confirm.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonCognitoPowerUser
-  #     Events:
-  #       confirmUserPost:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /confirm-user
-  #           Method: POST
-  #       confirmUserOptions:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /confirm-user
-  #           Method: OPTIONS
-  #     Environment:
-  #       Variables:
-  #         USERS_TABLE: !Ref UsersTable
-  #         USER_POOL_ID: !Ref BlogUserPool
+  ConfirmUserLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-confirm-user
+      Handler: users.confirm.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonCognitoPowerUser
+      Events:
+        confirmUserPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /confirm-user
+            Method: POST
+        confirmUserOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /confirm-user
+            Method: OPTIONS
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          USER_POOL_ID: !Ref jaladUserPool
 
-  # GetBlogsLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-get-blogs
-  #     Handler: blogs.get.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blogs
-  #           Method: GET
-  #     Environment:
-  #       Variables:
-  #         BLOGS_TABLE: !Ref BlogsTable
-  #         MEDIA_BCUKET: !Ref MediaBucket
+  GetBlogsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-get-blogs
+      Handler: blogs.get.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs
+            Method: GET
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          MEDIA_BCUKET: !Ref MediaBucket
 
-  # CreateBlogsLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-create-blogs
-  #     Handler: blogs.create.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       createBlogPost:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /create-blog
-  #           Method: POST
-  #           # Auth:
-  #           #   Authorizer: CognitoAuth
-  #       createBlogOptions:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /create-blog
-  #           Method: OPTIONS
-  #     Environment:
-  #       Variables:
-  #         # BLOGS_TABLE: !Ref BlogsTable
-  #         ENV : !Ref Env
-  #         BLOG_IMAGES_BUCKET: !Ref MediaBucket
+  CreateBlogsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-create-blogs
+      Handler: blogs.create.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        createBlogPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /create-blog
+            Method: POST
+            # Auth:
+            #   Authorizer: CognitoAuth
+        createBlogOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /create-blog
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          ENV : !Ref Env
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
-  # GetBlogsByCategoryLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-get-blogs-by-category
-  #     Handler: blogs.get_by_category.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       getBlogsByCategoryPost:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blogs-by-category
-  #           Method: GET
-  #       getBlogsByCategoryOptions:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blogs-by-category
-  #           Method: OPTIONS
-  #     Environment:
-  #       Variables:
-  #         # BLOGS_TABLE: !Ref BlogsTable
-  #         BLOG_IMAGES_BUCKET: !Ref MediaBucket
+  GetBlogsByCategoryLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-get-blogs-by-category
+      Handler: blogs.get_by_category.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        getBlogsByCategoryPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs-by-category
+            Method: GET
+        getBlogsByCategoryOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs-by-category
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
-  # GetBlogByIdLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-get-blog-by-id
-  #     Handler: blogs.get_by_id.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       getBlogByIdPost:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blog-by-id
-  #           Method: GET
-  #       getBlogByIdOptions:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blog-by-id
-  #           Method: OPTIONS
-  #     Environment:
-  #       Variables:
-  #         # BLOGS_TABLE: !Ref BlogsTable
-  #         BLOG_IMAGES_BUCKET: !Ref MediaBucket
+  GetBlogByIdLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-get-blog-by-id
+      Handler: blogs.get_by_id.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        getBlogByIdPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blog-by-id
+            Method: GET
+        getBlogByIdOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blog-by-id
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
 
-  
-  # DownloadResumeLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub download-resume-${ProjectName}-${Env}
-  #     Handler: resume.download.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonS3FullAccess
-  #     Environment:
-  #       Variables:
-  #         RESUME_BUCKET: !Ref MediaBucket
-  #         RESUME_KEY: resume/resume.pdf
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /download-resume
-  #           Method: GET
-
-  # GetBlogByIdLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub get-blog-by-id-${ProjectName}-${Env}
-  #     Handler: blogs.getbyid.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blog
-  #           Method: GET
-  #     Environment:
-  #       Variables:
-  #         BLOGS_TABLE: !Ref BlogsTable
-  #         MEDIA_BCUKET: !Ref MediaBucket
-
-  # UploadToS3Lambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-upload-to-s3
-  #     Handler: common.upload_to_s3.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       uploadToS3Post:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /upload-to-s3
-  #           Method: POST
-  #       uploadToS3Options:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /upload-to-s3
-  #           Method: OPTIONS
-  #     Environment:
-  #       Variables:
-  #         MEDIA_BUCKET: !Ref MediaBucket
-  #         ENV : !Ref Env
+  UploadToS3Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-upload-to-s3
+      Handler: common.upload_to_s3.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonS3FullAccess
+      Events:
+        uploadToS3Post:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /upload-to-s3
+            Method: POST
+        uploadToS3Options:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /upload-to-s3
+            Method: OPTIONS
+      Environment:
+        Variables:
+          MEDIA_BUCKET: !Ref MediaBucket
+          ENV : !Ref Env
 
 Parameters:
   Env:
@@ -459,13 +417,13 @@ Parameters:
     Description: The name of the project
     Default: jalad
 
-# Outputs:
-#   ApiBaseUrl:
-#     Description: "Base URL for the API Gateway"
-#     Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
-#   CognitoUserPoolId:
-#     Description: "Cognito User Pool ID"
-#     Value: !Ref BlogUserPool
-#   CognitoIdentityPoolId:
-#     Description: "Cognito Identity Pool ID"
-#     Value: !Ref BlogIdentityPool
+Outputs:
+  ApiBaseUrl:
+    Description: "Base URL for the API Gateway"
+    Value: !Sub "https://${jaladAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}"
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref jaladUserPool
+  CognitoIdentityPoolId:
+    Description: "Cognito Identity Pool ID"
+    Value: !Ref jaladIdentityPool
