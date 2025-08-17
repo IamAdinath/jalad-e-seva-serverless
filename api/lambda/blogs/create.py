@@ -124,7 +124,9 @@ def lambda_handler(event, context):
             "status": blog_status,
             "images": image_urls,
             "createdAt": now,
-            "updatedAt": now
+            "updatedAt": now,
+            "statusCategory": f"{blog_status}-{category}"
+            "statusPublishedAt": f"{blog_status}-{now}",
         }
         if ttl_value:
             item["ttl"] = ttl_value
