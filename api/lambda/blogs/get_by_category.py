@@ -1,14 +1,11 @@
 """
-get blogs by category
+get blogs by category with pagination
 """
 import os
-import uuid
 import json
-import base64
 import logging
-from datetime import datetime, timedelta
-from requests_toolbelt.multipart import decoder
 import boto3
+from boto3.dynamodb.conditions import Key
 from common.s3 import get_s3_file_url
 from common.utils import build_response
 from common.constants import StatusCodes, Headers
@@ -32,48 +29,73 @@ def lambda_handler(event, context):
 
         logger.info(f"Received event: {event}")
 
-        # Get content-type header
-        category = event["queryStringParameters"].get("category")
+        params = event.get("queryStringParameters") or {}
+        category = params.get("category")
+        limit = int(params.get("limit", 10))
+        last_evaluated_key = params.get("last_evaluated_key")
+
         if not category:
             return build_response(
                 StatusCodes.BAD_REQUEST,
                 Headers.BAD_REQUEST,
                 {"message": "Missing 'category' query parameter."},
             )
-        logger.info(f"Fetching blogs for category: {category}")
-        # Fetch blogs from DynamoDB
+
         table = dynamodb.Table(BLOGS_TABLE)
-        response = table.query(
-            IndexName="CategoryIndex",
-            KeyConditionExpression=boto3.dynamodb.conditions.Key("category").eq(category)
-        )
+
+        query_params = {
+            "IndexName": "CategoryIndex",
+            "KeyConditionExpression": Key("category").eq(category),
+            "Limit": limit
+        }
+        if last_evaluated_key:
+            try:
+                query_params["ExclusiveStartKey"] = json.loads(last_evaluated_key)
+            except Exception as e:
+                logger.warning(f"Invalid last_evaluated_key: {last_evaluated_key}, error: {e}")
+
+        response = table.query(**query_params)
         blogs = response.get("Items", [])
+
         if not blogs:
             return build_response(
                 StatusCodes.NOT_FOUND,
-                Headers.NOT_FOUND,
+                Headers.DEFAULT,
                 {"message": "No blogs found for the specified category."},
             )
-        logger.info(f"Found {len(blogs)} blogs for category: {category}")
-        # Format the response
+
         formatted_blogs = []
         for blog in blogs:
+            image_path = blog.get("image")
+            if image_path:
+                image = get_s3_file_url(S3_BUCKET, image_path)
+            else:
+                image = ""
+
             formatted_blog = {
                 "id": blog.get("id"),
                 "title": blog.get("title"),
-                "content": blog.get("content"),
+                "summary": blog.get("content"),
+                "image": image,
+                "htmlContent": blog.get("content"),
+                "textContent": "",
+                "startDate": blog.get("startDate"),
+                "endDate": blog.get("endDate"),
                 "category": blog.get("category"),
-                "image_url": get_s3_file_url(S3_BUCKET, blog.get("image", [])[0]),
-                "created_at": blog.get("created_at"),
             }
-            formatted_blogs.append(formatted_blog)  
+            formatted_blogs.append(formatted_blog)
+
         return build_response(
             StatusCodes.OK,
             Headers.DEFAULT,
-            {"blogs": formatted_blogs},
+            {
+                "blogs": formatted_blogs,
+                # "last_evaluated_key": json.dumps(response.get("LastEvaluatedKey")) if "LastEvaluatedKey" in response else None
+            },
         )
+
     except Exception as e:
-        logger.error(f"Error fetching blogs by category: {str(e)}")
+        logger.error(f"Error fetching blogs by category: {str(e)}", exc_info=True)
         return build_response(
             StatusCodes.INTERNAL_SERVER_ERROR,
             Headers.INTERNAL_SERVER_ERRORS,
