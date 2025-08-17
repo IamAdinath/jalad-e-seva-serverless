@@ -39,14 +39,14 @@ def lambda_handler(event, context):
                 {"message": "Missing request body."},
             )
 
-        title = fields.get("title")
-        content = fields.get("htmlContent")
-        summary = fields.get("contentSummary")
-        startDate = fields.get("startDate")
-        endDate = fields.get("endDate")
-        category = fields.get("category")
-        image_urls = fields.get("images", [])
-        blog_status = fields.get("status", "published")
+        title = payload.get("title")
+        content = payload.get("htmlContent")
+        summary = payload.get("contentSummary")
+        startDate = payload.get("startDate")
+        endDate = payload.get("endDate")
+        category = payload.get("category")
+        image_urls = payload.get("image")
+        blog_status = payload.get("status", "published")
 
         if not title or not content or not image_urls:
             logger.error(f"Invalid Title: {title} or Content: {content} or Images: {image_urls}")
@@ -79,7 +79,7 @@ def lambda_handler(event, context):
             "images": image_urls,
             "createdAt": now,
             "updatedAt": now,
-            "statusCategory": f"{blog_status}-{category}"
+            "statusCategory": f"{blog_status}-{category}",
             "statusPublishedAt": f"{blog_status}-{now}",
         }
         if ttl_value:
