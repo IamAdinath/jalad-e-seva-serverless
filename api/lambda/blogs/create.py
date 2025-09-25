@@ -25,7 +25,7 @@ def lambda_handler(event, context):
         if not BLOGS_TABLE or not S3_BUCKET:
             return build_response(
                 StatusCodes.INTERNAL_SERVER_ERROR,
-                Headers.INTERNAL_SERVER_ERRORS,
+                Headers.INTERNAL_SERVER_ERROR,
                 {"message": "Environment variables BLOGS_TABLE or BLOG_IMAGES_BUCKET not set."},
             )
 
@@ -44,12 +44,12 @@ def lambda_handler(event, context):
         summary = payload.get("contentSummary")
         startDate = payload.get("startDate")
         endDate = payload.get("endDate")
+        imageType = payload.get("imageType")
         category = payload.get("category")
-        image_urls = payload.get("image")
         blog_status = payload.get("status", "published")
 
-        if not title or not content or not image_urls:
-            logger.error(f"Invalid Title: {title} or Content: {content} or Images: {image_urls}")
+        if not title or not content or not imageType:
+            logger.error(f"Invalid Title: {title} or Content: {content} or Images: {imageType}")
             return build_response(
                 StatusCodes.BAD_REQUEST,
                 Headers.BAD_REQUEST,
@@ -70,17 +70,16 @@ def lambda_handler(event, context):
         item = {
             "id": blog_id,
             "title": title,
-            "content": content,
+            "htmlContent": content,  # Changed from 'content' to 'htmlContent'
             "contentSummary": summary,
             "startDate": startDate,
             "endDate": endDate,
-            "category": category,
+            "category": category or "general",  # Ensure category is not None
             "status": blog_status,
-            "image": image_urls,
+            "image": f"{blog_id}{imageType}",
             "createdAt": now,
             "updatedAt": now,
-            "statusCategory": f"{blog_status}-{category}",
-            "statusPublishedAt": f"{blog_status}-{now}",
+            "publishedAt": now,  # Separate field for the GSI
         }
         if ttl_value:
             item["ttl"] = ttl_value

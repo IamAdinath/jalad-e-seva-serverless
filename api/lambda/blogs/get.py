@@ -1,5 +1,5 @@
 """
-get blogs by category with pagination
+Get all blogs with pagination
 """
 import os
 import json
@@ -30,24 +30,33 @@ def lambda_handler(event, context):
         logger.info(f"Received event: {event}")
 
         params = event.get("queryStringParameters") or {}
-        category = params.get("category")
         limit = int(params.get("limit", 10))
         last_evaluated_key = params.get("last_evaluated_key")
-
-        if not category:
-            return build_response(
-                StatusCodes.BAD_REQUEST,
-                Headers.BAD_REQUEST,
-                {"message": "Missing 'category' query parameter."},
-            )
+        status = params.get("status", "published")  # Default to published blogs
 
         table = dynamodb.Table(BLOGS_TABLE)
 
+        # First try to scan the table to see if we have any data at all
+        try:
+            scan_response = table.scan(Limit=5)
+            logger.info(f"Sample items from table: {scan_response.get('Items', [])}")
+            logger.info(f"Table scan count: {scan_response.get('Count', 0)}")
+        except Exception as scan_error:
+            logger.error(f"Table scan failed: {scan_error}")
+            return build_response(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                Headers.INTERNAL_SERVER_ERROR,
+                {"message": f"Table access failed: {str(scan_error)}"},
+            )
+        
+        # Query using the status-publishedAt index to get published blogs ordered by date
         query_params = {
-            "IndexName": "statusCategoryIndex",
-            "KeyConditionExpression": Key("status").eq("published") & Key("category").eq(category),
+            "IndexName": "statusPublishedAtIndex",
+            "KeyConditionExpression": Key("status").eq(status),
+            "ScanIndexForward": False,  # Sort in descending order (newest first)
             "Limit": limit
         }
+        
         if last_evaluated_key:
             try:
                 query_params["ExclusiveStartKey"] = json.loads(last_evaluated_key)
@@ -64,21 +73,22 @@ def lambda_handler(event, context):
             # Fallback to scan if GSI query fails
             logger.info("Falling back to table scan")
             scan_params = {
-                "FilterExpression": Attr("category").eq(category) & Attr("status").eq("published"),
                 "Limit": limit
             }
+            if status and status != "all":
+                scan_params["FilterExpression"] = Attr("status").eq(status)
             
             response = table.scan(**scan_params)
             blogs = response.get("Items", [])
         
-        logger.info(f"Found {len(blogs)} blogs for category {category}")
+        logger.info(f"Found {len(blogs)} blogs")
         logger.info(f"Response keys: {list(response.keys())}")
 
         if not blogs:
             return build_response(
                 StatusCodes.OK,
                 Headers.DEFAULT,
-                {"blogs": [], "message": "No blogs found for the specified category.", "query_params": query_params},
+                {"blogs": [], "message": "No blogs found.", "query_params": query_params, "table_items_count": scan_response.get("Count", 0)},
             )
 
         formatted_blogs = []
@@ -104,17 +114,26 @@ def lambda_handler(event, context):
             }
             formatted_blogs.append(formatted_blog)
 
+        result = {
+            "blogs": formatted_blogs,
+            "count": len(formatted_blogs)
+        }
+        
+        # Include pagination info if there are more items
+        if "LastEvaluatedKey" in response:
+            result["last_evaluated_key"] = json.dumps(response["LastEvaluatedKey"])
+            result["has_more"] = True
+        else:
+            result["has_more"] = False
+
         return build_response(
             StatusCodes.OK,
             Headers.DEFAULT,
-            {
-                "blogs": formatted_blogs,
-                # "last_evaluated_key": json.dumps(response.get("LastEvaluatedKey")) if "LastEvaluatedKey" in response else None
-            },
+            result,
         )
 
     except Exception as e:
-        logger.error(f"Error fetching blogs by category: {str(e)}", exc_info=True)
+        logger.error(f"Error fetching blogs: {str(e)}", exc_info=True)
         return build_response(
             StatusCodes.INTERNAL_SERVER_ERROR,
             Headers.INTERNAL_SERVER_ERROR,

@@ -12,21 +12,33 @@ const CategoryBlogs: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!category) return;
+    console.log("CategoryBlogs useEffect triggered with category:", category);
 
+    if (!category) {
+      console.log("No category provided, returning early");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Fetching blogs for category:", category);
     setLoading(true);
     getBlogsbyCategory(category)
       .then((data) => {
+        console.log("getBlogsbyCategory response:", data);
         if (Array.isArray(data)) {
+          console.log("Setting blogs:", data.length, "items");
           setBlogs(data);
         } else {
-          console.error("Error fetching blogs:", data);
+          console.error("Error fetching blogs - not an array:", data);
+          setBlogs([]); // Set empty array if no blogs found
         }
       })
       .catch((error) => {
-        console.error("Error fetching blogs:", error);
+        console.error("Error fetching blogs - catch block:", error);
+        setBlogs([]); // Set empty array on error
       })
       .finally(() => {
+        console.log("Setting loading to false");
         setLoading(false);
       });
   }, [category]); // dependency array to re-run on category change

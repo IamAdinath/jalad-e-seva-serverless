@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../assets/images/logoindia.png';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next'; 
@@ -31,20 +32,21 @@ const Header: React.FC = () => {
       <div className="container">
         <nav className="navbar">
           {/* LOGO */}
-          <a href="/" className="logo">
+          <Link to="/" className="logo">
             <img src={logo} alt="e-Seva Logo" className="logo-img" />
             <span className="logo-text">e-Seva</span>
-          </a>
+          </Link>
 
           {/* NAVIGATION LINKS */}
           {/* The class will be "nav-links" or "nav-links active" */}
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
-            <li><a href="/">{t('navHome')}</a></li>
-            <li><a href="/Schemes">{t('navSchemes')}</a></li>
-            <li><a href="/Jobs">{t('navJobs')}</a></li>
-            <li><a href="/Services">{t('navBusinesses')}</a></li>
-            <li><a href="/Students">{t('navStudents')}</a></li>
-            <li><a href="/Farmers">{t('navFarmers')}</a></li>
+            <li><Link to="/">{t('navHome')}</Link></li>
+            <li><Link to="/blogs">{t('navBlogs') || 'Blogs'}</Link></li>
+            <li><Link to="/Schemes">{t('navSchemes')}</Link></li>
+            <li><Link to="/Jobs">{t('navJobs')}</Link></li>
+            <li><Link to="/Services">{t('navBusinesses')}</Link></li>
+            <li><Link to="/Students">{t('navStudents')}</Link></li>
+            <li><Link to="/Farmers">{t('navFarmers')}</Link></li>
             
             {/* ADD THE LANGUAGE SWITCHER HERE */}
             <li className="nav-translate">

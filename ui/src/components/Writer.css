@@ -6,6 +6,8 @@
 :root {
   --primary-color: #00796b;      /* Deep Teal */
   --secondary-color: #ffc107;   /* Amber/Gold */
+  --info-color: #17a2b8;      /* Info Blue */
+  --info-hover-color: #138496; /* Darker Info Blue */
   --success-color: #28a745;
   --success-hover-color: #00796b;
   --text-color: #212529;
@@ -220,6 +222,24 @@
   box-shadow: var(--shadow-md);
 }
 
+.draft-button {
+  background-color: var(--info-color);
+  color: black;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.draft-button:hover {
+  background-color: var(--info-hover-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
 .date-input {
   width: 95%;
   padding: 10px 15px;

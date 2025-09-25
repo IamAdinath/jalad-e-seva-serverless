@@ -22,12 +22,39 @@ def get_s3_file(bucket: str, key: str) -> Optional[str]:
         return None
 
 
-def put_s3_file(bucket: str, key: str, content: str) -> bool:
-    """Upload a string content to S3."""
+def put_s3_file(bucket: str, key: str, content, content_type: str = None) -> bool:
+    """Upload content to S3."""
     try:
+        # Handle different content types
         if isinstance(content, str):
             content = content.encode('utf-8')
-        s3_client.put_object(Bucket=bucket, Key=key, Body=content)
+            if not content_type:
+                content_type = 'text/plain'
+        elif isinstance(content, bytes):
+            # For binary files, try to determine content type from extension
+            if not content_type:
+                if key.lower().endswith(('.jpg', '.jpeg')):
+                    content_type = 'image/jpeg'
+                elif key.lower().endswith('.png'):
+                    content_type = 'image/png'
+                elif key.lower().endswith('.gif'):
+                    content_type = 'image/gif'
+                elif key.lower().endswith('.pdf'):
+                    content_type = 'application/pdf'
+                else:
+                    content_type = 'application/octet-stream'
+        
+        # Upload with content type
+        put_args = {
+            'Bucket': bucket,
+            'Key': key,
+            'Body': content
+        }
+        
+        if content_type:
+            put_args['ContentType'] = content_type
+            
+        s3_client.put_object(**put_args)
         return True
     except ClientError as e:
         logging.error(f"Error putting file to {bucket}/{key}: {e}")

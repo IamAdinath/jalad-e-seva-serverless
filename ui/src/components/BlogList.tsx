@@ -36,6 +36,16 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, loading = false }) => {
                   <p className="card-summary">{post.summary}</p>
                   <div className="card-footer">
                     <div className="post-meta">
+                      {post.category && (
+                        <>
+                          <span>
+                            <Link to={`/category/${post.category}`} style={{ color: '#007bff', textDecoration: 'none' }}>
+                              {post.category}
+                            </Link>
+                          </span>
+                          <span className="separator">·</span>
+                        </>
+                      )}
                       <span>{t("BlogLastDate")}: </span>
                       <span>{post.endDate}</span>
                       <span className="separator">·</span>

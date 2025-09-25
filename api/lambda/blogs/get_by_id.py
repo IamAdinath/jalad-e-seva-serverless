@@ -26,13 +26,14 @@ def lambda_handler(event, context):
 
         logger.info(f"Received event: {event}")
 
-        # Get blog ID from path parameters
-        blog_id = str(event["multiValueQueryStringParameters"].get("id")[0])
+        # Get blog ID from query parameters
+        params = event.get("queryStringParameters") or {}
+        blog_id = params.get("id")
         if not blog_id:
             return build_response(
                 StatusCodes.BAD_REQUEST,
                 Headers.BAD_REQUEST,
-                {"message": "Missing 'id' path parameter."},
+                {"message": "Missing 'id' query parameter."},
             )
         logger.info(f"Fetching blog with ID: {blog_id}")
 
@@ -54,13 +55,15 @@ def lambda_handler(event, context):
         formatted_blog = {
             "id": blog.get("id"),
             "title": blog.get("title"),
-            "summary": blog.get("content"),
+            "summary": blog.get("contentSummary", blog.get("content", "")),
             "image": image,
-            "htmlContent": blog.get("content"),
+            "htmlContent": blog.get("htmlContent", blog.get("content", "")),
             "textContent": "",
             "startDate": blog.get("startDate"),
             "endDate": blog.get("endDate"),
             "category": blog.get("category"),
+            "publishedAt": blog.get("publishedAt"),
+            "status": blog.get("status")
         }
         
         return build_response(

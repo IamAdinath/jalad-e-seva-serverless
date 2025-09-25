@@ -1,94 +1,139 @@
 
 
-import { baseHeaders, apiEndpoints } from './constants';
+import { apiEndpoints } from './constants';
+import type { UploadToS3Response, GetBlogsResponse } from './types';
 
-import { 
-  type CreateBlogPost, 
-  type APIErrorResponse, 
+import {
+  type CreateBlogPost,
+  type APIErrorResponse,
   type CreateBlogPostSuccessResponse,
   type BlogPost
 } from './types';
 
-export function uploadToS3(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append('file_name', file);
-  return fetch(apiEndpoints.uploadToS3, {
-    headers: baseHeaders,
-    method: 'POST',
-    body: formData,
-  })
-    .then(response => response.json())
-    .then(data => data.url)
-    .catch(error => {
-      console.error('Error uploading thumbnail:', error);
-      throw error;
-    });
-} 
+export async function uploadToS3(
+  filename: string,
+  file: File
+): Promise<UploadToS3Response | APIErrorResponse> {
 
-export function createBlog(postData: CreateBlogPost): Promise<CreateBlogPostSuccessResponse | APIErrorResponse> {
-  const hasFile = postData.image instanceof File;
-
-  if (hasFile) {
+  try {
     const formData = new FormData();
-    Object.entries(postData).forEach(([key, value]) => {
-      formData.append(key, value as any);
+    formData.append('file', file);
+    formData.append('filename', filename);
+    formData.append('fileType', file.type);
+
+    const response = await fetch(apiEndpoints.uploadToS3, {
+      method: 'POST',
+      body: formData,
     });
 
-    return fetch(apiEndpoints.createPost, {
-      method: "POST",
-      body: formData,
-    })
-      .then(response => response.json())
-      .catch(error => {
-        console.error("Error creating blog post:", error);
-        throw error;
-      });
-  } else {
-    return fetch(apiEndpoints.createPost, {
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `File upload failed with status ${response.status}`);
+    }
+
+    const successData: UploadToS3Response = await response.json();
+    return successData;
+
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    return { error: (error as Error).message, status: 'error' } as APIErrorResponse;
+  }
+}
+
+export async function createBlog(
+  postData: CreateBlogPost
+): Promise<CreateBlogPostSuccessResponse | APIErrorResponse> {
+  try {
+    const response = await fetch(apiEndpoints.createPost, {
       method: "POST",
       body: JSON.stringify(postData),
-    })
-      .then(response => response.json())
-      .catch(error => {
-        console.error("Error creating blog post:", error);
-        throw error;
-      });
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    }
+
+    const successData: CreateBlogPostSuccessResponse = await response.json();
+    return successData;
+
+  } catch (error) {
+    console.error("Error creating blog post:", error);
+    return { error: (error as Error).message, status: 'error' } as APIErrorResponse;
   }
 }
 
 
-export function getBlogsbyCategory(
+export async function getBlogsbyCategory(
   category: string
 ): Promise<BlogPost[] | APIErrorResponse> {
-  return fetch(apiEndpoints.getBlogsbyCategory(category), { method: "GET" })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data && Array.isArray(data.blogs)) {
-        return data.blogs as BlogPost[];
-      } else {
-        throw new Error("Invalid response format: 'blogs' not found");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching blogs by category:", error);
-      return Promise.reject({ error: "Failed to fetch blogs by category" });
-    });
+  try {
+    const url = apiEndpoints.getBlogsbyCategory(category);
+    console.log("Fetching blogs by category from URL:", url);
+    
+    const res = await fetch(url, { method: "GET" });
+    console.log("Response status:", res.status);
+    
+    const data = await res.json();
+    console.log("Response data:", data);
+
+    if (data && Array.isArray(data.blogs)) {
+      return data.blogs as BlogPost[];
+    } else {
+      console.error("Invalid response format:", data);
+      throw new Error("Invalid response format: 'blogs' not found");
+    }
+  } catch (error) {
+    console.error("Error fetching blogs by category:", error);
+    return { error: "Failed to fetch blogs by category" } as APIErrorResponse;
+  }
 }
 
-export function getBlogbyId(
+export async function getBlogbyId(
   id: string
 ): Promise<BlogPost | APIErrorResponse> {
-  return fetch(apiEndpoints.getPostById(id), { method: "GET"})
-    .then((res) => res.json())
-    .then((data) => {
-      if (data && data.post) {
-        return data.post as BlogPost;
-      } else {
-        throw new Error("Invalid response format: 'post' not found");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching blog by ID:", error);
-      return Promise.reject({ error: "Failed to fetch blog by ID" });
-    });
+  try {
+    const res = await fetch(apiEndpoints.getPostById(id), { method: "GET" });
+    const data = await res.json();
+
+    if (data && data.post) {
+      return data.post as BlogPost;
+    } else {
+      throw new Error("Invalid response format: 'post' not found");
+    }
+  } catch (error) {
+    console.error("Error fetching blog by ID:", error);
+    return { error: "Failed to fetch blog by ID" } as APIErrorResponse;
+  }
+}
+export async function getBlogs(
+  limit?: number,
+  lastKey?: string,
+  status?: string
+): Promise<GetBlogsResponse | APIErrorResponse> {
+  try {
+    const url = apiEndpoints.getBlogs(limit, lastKey, status);
+    console.log("Fetching blogs from URL:", url);
+    
+    const res = await fetch(url, { method: "GET" });
+    console.log("Response status:", res.status);
+    
+    const data = await res.json();
+    console.log("Response data:", data);
+    
+    if (data && Array.isArray(data.blogs)) {
+      return {
+        blogs: data.blogs as BlogPost[],
+        count: data.count || data.blogs.length,
+        has_more: data.has_more || false,
+        last_evaluated_key: data.last_evaluated_key
+      } as GetBlogsResponse;
+    } else {
+      console.error("Invalid response format:", data);
+      throw new Error("Invalid response format: 'blogs' not found or not an array");
+    }
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return { error: "Failed to fetch blogs" } as APIErrorResponse;
+  }
 }
