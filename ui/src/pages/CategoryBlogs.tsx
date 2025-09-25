@@ -16,6 +16,15 @@ const CategoryBlogs: React.FC = () => {
 
     if (!category) {
       console.log("No category provided, returning early");
+      setLoading(false);
+      return;
+    }
+
+    // Only fetch blogs for actual category pages, not system pages
+    const systemPages = ['schemes', 'jobs', 'services', 'students', 'farmers', 'blogs', 'create-post'];
+    if (systemPages.includes(category.toLowerCase())) {
+      console.log("System page detected, not fetching blogs for:", category);
+      setLoading(false);
       return;
     }
 
