@@ -16,13 +16,8 @@ function App() {
         <Route path="/blogs" element={<AllBlogs />} />
         <Route path="/blog/:id" element={<Blog />} />
         <Route path="/create-post" element={<CreatePost />} />
-        <Route path="/schemes" element={<Home />} />
-        <Route path="/jobs" element={<Home />} />
-        <Route path="/services" element={<Home />} />
-        <Route path="/students" element={<Home />} />
-        <Route path="/farmers" element={<Home />} />
-        {/* Category route should be last to avoid catching other routes */}
-        <Route path="/category/:category" element={<CategoryBlogs />} />
+        {/* All other paths are treated as categories */}
+        <Route path="/:category" element={<CategoryBlogs />} />
       </Routes>
     </Router>
     </div>

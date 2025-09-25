@@ -20,14 +20,6 @@ const CategoryBlogs: React.FC = () => {
       return;
     }
 
-    // Only fetch blogs for actual category pages, not system pages
-    const systemPages = ['schemes', 'jobs', 'services', 'students', 'farmers', 'blogs', 'create-post'];
-    if (systemPages.includes(category.toLowerCase())) {
-      console.log("System page detected, not fetching blogs for:", category);
-      setLoading(false);
-      return;
-    }
-
     console.log("Fetching blogs for category:", category);
     setLoading(true);
     getBlogsbyCategory(category)
@@ -38,10 +30,12 @@ const CategoryBlogs: React.FC = () => {
           setBlogs(data);
         } else {
           console.error("Error fetching blogs - not an array:", data);
+          setBlogs([]); // Set empty array if no blogs found
         }
       })
       .catch((error) => {
         console.error("Error fetching blogs - catch block:", error);
+        setBlogs([]); // Set empty array on error
       })
       .finally(() => {
         console.log("Setting loading to false");
@@ -49,43 +43,9 @@ const CategoryBlogs: React.FC = () => {
       });
   }, [category]); // dependency array to re-run on category change
 
-  const testCategoryAPI = async () => {
-    console.log("Testing category API directly...");
-    try {
-      const url = `https://mt1vak2utb.execute-api.ap-south-1.amazonaws.com/dev/get-blogs-by-category?category=${category}`;
-      console.log("Testing URL:", url);
-
-      const response = await fetch(url);
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
-
-      const data = await response.json();
-      console.log("Response data:", data);
-    } catch (error) {
-      console.error("Direct API test error:", error);
-    }
-  };
-
   return (
     <>
       <Header />
-      <div style={{ padding: '1rem', textAlign: 'center' }}>
-        <h2>Category: {category}</h2>
-        <button
-          onClick={testCategoryAPI}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#28a745',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            marginBottom: '1rem'
-          }}
-        >
-          Test Category API
-        </button>
-      </div>
       <BlogList blogs={blogs} loading={loading} />
       <Footer />
     </>
