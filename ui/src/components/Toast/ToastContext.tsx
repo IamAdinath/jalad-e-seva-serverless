@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ToastType } from './Toast';
+import React, { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
+import type { ToastType } from './Toast';
 
 export interface ToastData {
   id: string;
