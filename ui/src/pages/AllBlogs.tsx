@@ -85,9 +85,42 @@ const AllBlogs: React.FC = () => {
     );
   }
 
+  const testAllBlogsAPI = async () => {
+    console.log("Testing all blogs API directly...");
+    try {
+      const url = `https://mt1vak2utb.execute-api.ap-south-1.amazonaws.com/dev/get-blogs?status=published&limit=10`;
+      console.log("Testing URL:", url);
+      
+      const response = await fetch(url);
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+      
+      const data = await response.json();
+      console.log("Response data:", data);
+    } catch (error) {
+      console.error("Direct API test error:", error);
+    }
+  };
+
   return (
     <>
       <Header />
+      <div style={{ padding: '1rem', textAlign: 'center' }}>
+        <button 
+          onClick={testAllBlogsAPI}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginBottom: '1rem'
+          }}
+        >
+          Test All Blogs API
+        </button>
+      </div>
       <BlogList blogs={blogs} loading={loading} />
       
       {/* Load More Button */}

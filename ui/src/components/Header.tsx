@@ -41,6 +41,8 @@ const Header: React.FC = () => {
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><a href="/">{t('navHome')}</a></li>
             <li><a href="/blogs">{t('navBlogs') || 'Blogs'}</a></li>
+            <li><a href="/category/general">General</a></li>
+            <li><a href="/category/technology">Technology</a></li>
             <li><a href="/Schemes">{t('navSchemes')}</a></li>
             <li><a href="/Jobs">{t('navJobs')}</a></li>
             <li><a href="/Services">{t('navBusinesses')}</a></li>
