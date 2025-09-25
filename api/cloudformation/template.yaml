@@ -215,6 +215,10 @@ Resources:
     Properties:
       Name: !Sub ${ProjectName}-${Env}-API
       StageName: !Ref Env
+      BinaryMediaTypes:
+        - "multipart/form-data"
+        - "image/*"
+        - "application/octet-stream"
       Cors:
         AllowMethods: OPTIONS,GET,POST,PUT,DELETE
         AllowHeaders: Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token
@@ -364,6 +368,8 @@ Resources:
     Properties:
       FunctionName: !Sub ${ProjectName}-${Env}-upload-to-s3
       Handler: common.upload_to_s3.lambda_handler
+      Timeout: 60
+      MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
         - AmazonS3FullAccess

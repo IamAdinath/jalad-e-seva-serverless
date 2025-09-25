@@ -117,7 +117,7 @@ const Writer: React.FC = () => {
       }
 
       const newBlogId = createResponse.id;
-      const filename = `${newBlogId}.${extension}`; // Use the new blog ID for the filename
+      const filename = `${newBlogId}${extension}`; // Use the new blog ID for the filename
       console.log(`Blog created with ID: ${newBlogId}. Now uploading image...`);
 
       // 3. --- Second API Call: Upload the Image file with the new Blog ID ---

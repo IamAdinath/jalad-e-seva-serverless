@@ -45,3 +45,8 @@ export interface DefaultResponse {
     status: string;
     message: string;
 }
+
+export interface UploadToS3Response extends DefaultResponse {
+    file_url: string;
+    filename: string;
+}
