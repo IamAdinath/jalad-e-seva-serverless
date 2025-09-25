@@ -112,8 +112,12 @@ const Writer: React.FC = () => {
 
       const createResponse = await createBlog(blogPostData as CreateBlogPost);
 
-      if ('error' in createResponse || !createResponse.id) {
-        throw new Error(createResponse.error || "Failed to save blog. No ID returned.");
+      if ('error' in createResponse) {
+        throw new Error(createResponse.error || "Failed to save blog.");
+      }
+      
+      if (!createResponse.id) {
+        throw new Error("Failed to save blog. No ID returned.");
       }
 
       const newBlogId = createResponse.id;
