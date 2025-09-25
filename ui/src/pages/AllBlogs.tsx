@@ -3,7 +3,7 @@ import BlogList from "../components/BlogList";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { BlogPost } from "../components/utils/types";
-import { getBlogs } from "../components/utils/apis";
+import { getBlogs, debugScan } from "../components/utils/apis";
 
 const AllBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -60,6 +60,12 @@ const AllBlogs: React.FC = () => {
     }
   };
 
+  const handleDebugScan = async () => {
+    console.log("Running debug scan...");
+    const result = await debugScan();
+    console.log("Debug scan result:", result);
+  };
+
   if (error) {
     return (
       <>
@@ -73,9 +79,20 @@ const AllBlogs: React.FC = () => {
             color: 'white', 
             border: 'none', 
             borderRadius: '4px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            marginRight: '1rem'
           }}>
             Try Again
+          </button>
+          <button onClick={handleDebugScan} style={{ 
+            padding: '0.5rem 1rem', 
+            backgroundColor: '#28a745', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Debug Scan
           </button>
         </div>
         <Footer />

@@ -50,14 +50,18 @@ def lambda_handler(event, context):
             except Exception as e:
                 logger.warning(f"Invalid last_evaluated_key: {last_evaluated_key}, error: {e}")
 
+        logger.info(f"Query params: {query_params}")
         response = table.query(**query_params)
         blogs = response.get("Items", [])
+        
+        logger.info(f"Found {len(blogs)} blogs")
+        logger.info(f"Response: {response}")
 
         if not blogs:
             return build_response(
                 StatusCodes.OK,
                 Headers.DEFAULT,
-                {"blogs": [], "message": "No blogs found."},
+                {"blogs": [], "message": "No blogs found.", "query_params": query_params},
             )
 
         formatted_blogs = []

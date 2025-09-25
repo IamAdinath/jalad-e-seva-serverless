@@ -44,8 +44,8 @@ def lambda_handler(event, context):
         table = dynamodb.Table(BLOGS_TABLE)
 
         query_params = {
-            "IndexName": "CategoryIndex",
-            "KeyConditionExpression": Key("category").eq(category),
+            "IndexName": "statusCategoryIndex",
+            "KeyConditionExpression": Key("status").eq("published") & Key("category").eq(category),
             "Limit": limit
         }
         if last_evaluated_key:
@@ -54,14 +54,18 @@ def lambda_handler(event, context):
             except Exception as e:
                 logger.warning(f"Invalid last_evaluated_key: {last_evaluated_key}, error: {e}")
 
+        logger.info(f"Query params: {query_params}")
         response = table.query(**query_params)
         blogs = response.get("Items", [])
+        
+        logger.info(f"Found {len(blogs)} blogs for category {category}")
+        logger.info(f"Response: {response}")
 
         if not blogs:
             return build_response(
-                StatusCodes.NOT_FOUND,
+                StatusCodes.OK,
                 Headers.DEFAULT,
-                {"message": "No blogs found for the specified category."},
+                {"blogs": [], "message": "No blogs found for the specified category.", "query_params": query_params},
             )
 
         formatted_blogs = []
@@ -75,13 +79,15 @@ def lambda_handler(event, context):
             formatted_blog = {
                 "id": blog.get("id"),
                 "title": blog.get("title"),
-                "summary": blog.get("content"),
+                "summary": blog.get("contentSummary", blog.get("content", "")),
                 "image": image,
-                "htmlContent": blog.get("content"),
+                "htmlContent": blog.get("htmlContent", blog.get("content", "")),
                 "textContent": "",
                 "startDate": blog.get("startDate"),
                 "endDate": blog.get("endDate"),
                 "category": blog.get("category"),
+                "publishedAt": blog.get("publishedAt"),
+                "status": blog.get("status")
             }
             formatted_blogs.append(formatted_blog)
 

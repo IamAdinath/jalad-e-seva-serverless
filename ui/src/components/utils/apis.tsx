@@ -68,12 +68,19 @@ export async function getBlogsbyCategory(
   category: string
 ): Promise<BlogPost[] | APIErrorResponse> {
   try {
-    const res = await fetch(apiEndpoints.getBlogsbyCategory(category), { method: "GET" });
+    const url = apiEndpoints.getBlogsbyCategory(category);
+    console.log("Fetching blogs by category from URL:", url);
+    
+    const res = await fetch(url, { method: "GET" });
+    console.log("Response status:", res.status);
+    
     const data = await res.json();
+    console.log("Response data:", data);
 
     if (data && Array.isArray(data.blogs)) {
       return data.blogs as BlogPost[];
     } else {
+      console.error("Invalid response format:", data);
       throw new Error("Invalid response format: 'blogs' not found");
     }
   } catch (error) {
@@ -99,16 +106,21 @@ export async function getBlogbyId(
     return { error: "Failed to fetch blog by ID" } as APIErrorResponse;
   }
 }
-export
-  async function getBlogs(
-    limit?: number,
-    lastKey?: string,
-    status?: string
-  ): Promise<GetBlogsResponse | APIErrorResponse> {
+export async function getBlogs(
+  limit?: number,
+  lastKey?: string,
+  status?: string
+): Promise<GetBlogsResponse | APIErrorResponse> {
   try {
-    const res = await fetch(apiEndpoints.getBlogs(limit, lastKey, status), { method: "GET" });
+    const url = apiEndpoints.getBlogs(limit, lastKey, status);
+    console.log("Fetching blogs from URL:", url);
+    
+    const res = await fetch(url, { method: "GET" });
+    console.log("Response status:", res.status);
+    
     const data = await res.json();
-
+    console.log("Response data:", data);
+    
     if (data && Array.isArray(data.blogs)) {
       return {
         blogs: data.blogs as BlogPost[],
@@ -117,10 +129,22 @@ export
         last_evaluated_key: data.last_evaluated_key
       } as GetBlogsResponse;
     } else {
+      console.error("Invalid response format:", data);
       throw new Error("Invalid response format: 'blogs' not found or not an array");
     }
   } catch (error) {
     console.error("Error fetching blogs:", error);
     return { error: "Failed to fetch blogs" } as APIErrorResponse;
+  }
+}
+export async function debugScan(): Promise<any> {
+  try {
+    const res = await fetch(apiEndpoints.debugScan, { method: "GET" });
+    const data = await res.json();
+    console.log("Debug scan result:", data);
+    return data;
+  } catch (error) {
+    console.error("Error in debug scan:", error);
+    return { error: "Failed to debug scan" };
   }
 }
