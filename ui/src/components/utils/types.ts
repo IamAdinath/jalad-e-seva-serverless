@@ -50,3 +50,10 @@ export interface UploadToS3Response extends DefaultResponse {
     file_url: string;
     filename: string;
 }
+
+export interface GetBlogsResponse {
+    blogs: BlogPost[];
+    count: number;
+    has_more: boolean;
+    last_evaluated_key?: string;
+}

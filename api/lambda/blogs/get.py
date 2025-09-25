@@ -1,5 +1,5 @@
 """
-get blogs by category with pagination
+Get all blogs with pagination
 """
 import os
 import json
@@ -30,24 +30,20 @@ def lambda_handler(event, context):
         logger.info(f"Received event: {event}")
 
         params = event.get("queryStringParameters") or {}
-        category = params.get("category")
         limit = int(params.get("limit", 10))
         last_evaluated_key = params.get("last_evaluated_key")
-
-        if not category:
-            return build_response(
-                StatusCodes.BAD_REQUEST,
-                Headers.BAD_REQUEST,
-                {"message": "Missing 'category' query parameter."},
-            )
+        status = params.get("status", "published")  # Default to published blogs
 
         table = dynamodb.Table(BLOGS_TABLE)
 
+        # Query using the status-publishedAt index to get published blogs ordered by date
         query_params = {
-            "IndexName": "CategoryIndex",
-            "KeyConditionExpression": Key("category").eq(category),
+            "IndexName": "statusPublishedAtIndex",
+            "KeyConditionExpression": Key("status").eq(status),
+            "ScanIndexForward": False,  # Sort in descending order (newest first)
             "Limit": limit
         }
+        
         if last_evaluated_key:
             try:
                 query_params["ExclusiveStartKey"] = json.loads(last_evaluated_key)
@@ -59,9 +55,9 @@ def lambda_handler(event, context):
 
         if not blogs:
             return build_response(
-                StatusCodes.NOT_FOUND,
+                StatusCodes.OK,
                 Headers.DEFAULT,
-                {"message": "No blogs found for the specified category."},
+                {"blogs": [], "message": "No blogs found."},
             )
 
         formatted_blogs = []
@@ -75,27 +71,38 @@ def lambda_handler(event, context):
             formatted_blog = {
                 "id": blog.get("id"),
                 "title": blog.get("title"),
-                "summary": blog.get("content"),
+                "summary": blog.get("contentSummary", blog.get("content", "")),
                 "image": image,
-                "htmlContent": blog.get("content"),
+                "htmlContent": blog.get("htmlContent", blog.get("content", "")),
                 "textContent": "",
                 "startDate": blog.get("startDate"),
                 "endDate": blog.get("endDate"),
                 "category": blog.get("category"),
+                "publishedAt": blog.get("publishedAt"),
+                "status": blog.get("status")
             }
             formatted_blogs.append(formatted_blog)
+
+        result = {
+            "blogs": formatted_blogs,
+            "count": len(formatted_blogs)
+        }
+        
+        # Include pagination info if there are more items
+        if "LastEvaluatedKey" in response:
+            result["last_evaluated_key"] = json.dumps(response["LastEvaluatedKey"])
+            result["has_more"] = True
+        else:
+            result["has_more"] = False
 
         return build_response(
             StatusCodes.OK,
             Headers.DEFAULT,
-            {
-                "blogs": formatted_blogs,
-                # "last_evaluated_key": json.dumps(response.get("LastEvaluatedKey")) if "LastEvaluatedKey" in response else None
-            },
+            result,
         )
 
     except Exception as e:
-        logger.error(f"Error fetching blogs by category: {str(e)}", exc_info=True)
+        logger.error(f"Error fetching blogs: {str(e)}", exc_info=True)
         return build_response(
             StatusCodes.INTERNAL_SERVER_ERROR,
             Headers.INTERNAL_SERVER_ERROR,

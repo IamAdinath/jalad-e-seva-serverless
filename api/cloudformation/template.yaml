@@ -257,26 +257,32 @@ Resources:
           USERS_TABLE: !Ref UsersTable
           USER_POOL_ID: !Ref jaladUserPool
 
-  # GetBlogsLambda:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub ${ProjectName}-${Env}-get-blogs
-  #     Handler: blogs.get.lambda_handler
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - AmazonDynamoDBFullAccess
-  #       - AmazonS3FullAccess
-  #     Events:
-  #       AddItem:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref jaladAPI
-  #           Path: /get-blogs
-  #           Method: GET
-  #     Environment:
-  #       Variables:
-  #         BLOGS_TABLE: !Ref BlogsTable
-  #         MEDIA_BCUKET: !Ref MediaBucket
+  GetBlogsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-get-blogs
+      Handler: blogs.get.lambda_handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        getBlogsGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs
+            Method: GET
+        getBlogsOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /get-blogs
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
   CreateBlogsLambda:
     Type: AWS::Serverless::Function

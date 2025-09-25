@@ -40,6 +40,7 @@ const Header: React.FC = () => {
           {/* The class will be "nav-links" or "nav-links active" */}
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><a href="/">{t('navHome')}</a></li>
+            <li><a href="/blogs">{t('navBlogs') || 'Blogs'}</a></li>
             <li><a href="/Schemes">{t('navSchemes')}</a></li>
             <li><a href="/Jobs">{t('navJobs')}</a></li>
             <li><a href="/Services">{t('navBusinesses')}</a></li>

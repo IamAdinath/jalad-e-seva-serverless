@@ -1,11 +1,11 @@
 
 
 import { apiEndpoints } from './constants';
-import type { UploadToS3Response } from './types';
+import type { UploadToS3Response, GetBlogsResponse } from './types';
 
-import { 
-  type CreateBlogPost, 
-  type APIErrorResponse, 
+import {
+  type CreateBlogPost,
+  type APIErrorResponse,
   type CreateBlogPostSuccessResponse,
   type BlogPost
 } from './types';
@@ -14,7 +14,7 @@ export async function uploadToS3(
   filename: string,
   file: File
 ): Promise<UploadToS3Response | APIErrorResponse> {
-  
+
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -36,7 +36,7 @@ export async function uploadToS3(
 
   } catch (error) {
     console.error("Error uploading file:", error);
-    return {error: (error as Error).message, status: 'error'} as APIErrorResponse;
+    return { error: (error as Error).message, status: 'error' } as APIErrorResponse;
   }
 }
 
@@ -59,7 +59,7 @@ export async function createBlog(
 
   } catch (error) {
     console.error("Error creating blog post:", error);
-    return {error: (error as Error).message, status: 'error'} as APIErrorResponse;
+    return { error: (error as Error).message, status: 'error' } as APIErrorResponse;
   }
 }
 
@@ -70,14 +70,14 @@ export async function getBlogsbyCategory(
   try {
     const res = await fetch(apiEndpoints.getBlogsbyCategory(category), { method: "GET" });
     const data = await res.json();
-    
-      if (data && Array.isArray(data.blogs)) {
-        return data.blogs as BlogPost[];
-      } else {
-        throw new Error("Invalid response format: 'blogs' not found");
-      }
+
+    if (data && Array.isArray(data.blogs)) {
+      return data.blogs as BlogPost[];
+    } else {
+      throw new Error("Invalid response format: 'blogs' not found");
+    }
   } catch (error) {
-      console.error("Error fetching blogs by category:", error);
+    console.error("Error fetching blogs by category:", error);
     return { error: "Failed to fetch blogs by category" } as APIErrorResponse;
   }
 }
@@ -88,14 +88,39 @@ export async function getBlogbyId(
   try {
     const res = await fetch(apiEndpoints.getPostById(id), { method: "GET" });
     const data = await res.json();
-    
-      if (data && data.post) {
-        return data.post as BlogPost;
-      } else {
-        throw new Error("Invalid response format: 'post' not found");
-      }
+
+    if (data && data.post) {
+      return data.post as BlogPost;
+    } else {
+      throw new Error("Invalid response format: 'post' not found");
+    }
   } catch (error) {
-      console.error("Error fetching blog by ID:", error);
+    console.error("Error fetching blog by ID:", error);
     return { error: "Failed to fetch blog by ID" } as APIErrorResponse;
+  }
+}
+export
+  async function getBlogs(
+    limit?: number,
+    lastKey?: string,
+    status?: string
+  ): Promise<GetBlogsResponse | APIErrorResponse> {
+  try {
+    const res = await fetch(apiEndpoints.getBlogs(limit, lastKey, status), { method: "GET" });
+    const data = await res.json();
+
+    if (data && Array.isArray(data.blogs)) {
+      return {
+        blogs: data.blogs as BlogPost[],
+        count: data.count || data.blogs.length,
+        has_more: data.has_more || false,
+        last_evaluated_key: data.last_evaluated_key
+      } as GetBlogsResponse;
+    } else {
+      throw new Error("Invalid response format: 'blogs' not found or not an array");
+    }
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return { error: "Failed to fetch blogs" } as APIErrorResponse;
   }
 }
