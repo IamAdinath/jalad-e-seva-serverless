@@ -1,7 +1,7 @@
 
 
 import { apiEndpoints } from './constants';
-import type { DefaultResponse, UploadToS3Response } from './types';
+import type { UploadToS3Response } from './types';
 
 import { 
   type CreateBlogPost, 
