@@ -397,25 +397,6 @@ Resources:
           MEDIA_BUCKET: !Ref MediaBucket
           ENV : !Ref Env
 
-  DebugScanLambda:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub ${ProjectName}-${Env}-debug-scan
-      Handler: blogs.debug_scan.lambda_handler
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - AmazonDynamoDBFullAccess
-      Events:
-        debugScanGet:
-          Type: Api
-          Properties:
-            RestApiId: !Ref jaladAPI
-            Path: /debug-scan
-            Method: GET
-      Environment:
-        Variables:
-          BLOGS_TABLE: !Ref BlogsTable
-
 Parameters:
   Env:
     Default: dev

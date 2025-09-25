@@ -5,7 +5,7 @@ import os
 import json
 import logging
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 from common.s3 import get_s3_file_url
 from common.utils import build_response
 from common.constants import StatusCodes, Headers
@@ -36,6 +36,19 @@ def lambda_handler(event, context):
 
         table = dynamodb.Table(BLOGS_TABLE)
 
+        # First try to scan the table to see if we have any data at all
+        try:
+            scan_response = table.scan(Limit=5)
+            logger.info(f"Sample items from table: {scan_response.get('Items', [])}")
+            logger.info(f"Table scan count: {scan_response.get('Count', 0)}")
+        except Exception as scan_error:
+            logger.error(f"Table scan failed: {scan_error}")
+            return build_response(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                Headers.INTERNAL_SERVER_ERROR,
+                {"message": f"Table access failed: {str(scan_error)}"},
+            )
+        
         # Query using the status-publishedAt index to get published blogs ordered by date
         query_params = {
             "IndexName": "statusPublishedAtIndex",
@@ -51,17 +64,31 @@ def lambda_handler(event, context):
                 logger.warning(f"Invalid last_evaluated_key: {last_evaluated_key}, error: {e}")
 
         logger.info(f"Query params: {query_params}")
-        response = table.query(**query_params)
-        blogs = response.get("Items", [])
+        
+        try:
+            response = table.query(**query_params)
+            blogs = response.get("Items", [])
+        except Exception as query_error:
+            logger.error(f"GSI query failed: {query_error}")
+            # Fallback to scan if GSI query fails
+            logger.info("Falling back to table scan")
+            scan_params = {
+                "Limit": limit
+            }
+            if status and status != "all":
+                scan_params["FilterExpression"] = Attr("status").eq(status)
+            
+            response = table.scan(**scan_params)
+            blogs = response.get("Items", [])
         
         logger.info(f"Found {len(blogs)} blogs")
-        logger.info(f"Response: {response}")
+        logger.info(f"Response keys: {list(response.keys())}")
 
         if not blogs:
             return build_response(
                 StatusCodes.OK,
                 Headers.DEFAULT,
-                {"blogs": [], "message": "No blogs found.", "query_params": query_params},
+                {"blogs": [], "message": "No blogs found.", "query_params": query_params, "table_items_count": scan_response.get("Count", 0)},
             )
 
         formatted_blogs = []

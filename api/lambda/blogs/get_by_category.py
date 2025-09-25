@@ -5,7 +5,7 @@ import os
 import json
 import logging
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 from common.s3 import get_s3_file_url
 from common.utils import build_response
 from common.constants import StatusCodes, Headers
@@ -55,11 +55,24 @@ def lambda_handler(event, context):
                 logger.warning(f"Invalid last_evaluated_key: {last_evaluated_key}, error: {e}")
 
         logger.info(f"Query params: {query_params}")
-        response = table.query(**query_params)
-        blogs = response.get("Items", [])
+        
+        try:
+            response = table.query(**query_params)
+            blogs = response.get("Items", [])
+        except Exception as query_error:
+            logger.error(f"GSI query failed: {query_error}")
+            # Fallback to scan if GSI query fails
+            logger.info("Falling back to table scan")
+            scan_params = {
+                "FilterExpression": Attr("category").eq(category) & Attr("status").eq("published"),
+                "Limit": limit
+            }
+            
+            response = table.scan(**scan_params)
+            blogs = response.get("Items", [])
         
         logger.info(f"Found {len(blogs)} blogs for category {category}")
-        logger.info(f"Response: {response}")
+        logger.info(f"Response keys: {list(response.keys())}")
 
         if not blogs:
             return build_response(

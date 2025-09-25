@@ -137,14 +137,3 @@ export async function getBlogs(
     return { error: "Failed to fetch blogs" } as APIErrorResponse;
   }
 }
-export async function debugScan(): Promise<any> {
-  try {
-    const res = await fetch(apiEndpoints.debugScan, { method: "GET" });
-    const data = await res.json();
-    console.log("Debug scan result:", data);
-    return data;
-  } catch (error) {
-    console.error("Error in debug scan:", error);
-    return { error: "Failed to debug scan" };
-  }
-}

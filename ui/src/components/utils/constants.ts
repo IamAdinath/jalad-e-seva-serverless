@@ -35,5 +35,4 @@ export const apiEndpoints = {
   deleteCategory: (id: string) => `${baseUrl}/categories/${id}`,
   getBlogsbyStatus: (status: string) => `${baseUrl}/blogs?status=${status}`,
   getBlogsbyCategory: (category: string) => `${baseUrl}/get-blogs-by-category?category=${category}`,
-  debugScan: `${baseUrl}/debug-scan`,
 };
