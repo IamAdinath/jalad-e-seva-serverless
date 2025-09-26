@@ -32,23 +32,28 @@ export interface StoredAuth {
 }
 
 export class AuthError extends Error {
+  code: string;
+  type: 'NETWORK' | 'AUTH' | 'PERMISSION' | 'TOKEN';
+
   constructor(
     message: string,
-    public code: string,
-    public type: 'NETWORK' | 'AUTH' | 'PERMISSION' | 'TOKEN'
+    code: string,
+    type: 'NETWORK' | 'AUTH' | 'PERMISSION' | 'TOKEN'
   ) {
     super(message);
     this.name = 'AuthError';
+    this.code = code;
+    this.type = type;
   }
 }
 
 export class CognitoAuthService {
   private userPool: AmazonCognitoIdentity.CognitoUserPool;
   private currentUser: AmazonCognitoIdentity.CognitoUser | null = null;
-  private readonly STORAGE_KEY = 'cognito_auth';
+  private STORAGE_KEY = 'cognito_auth';
 
   // Error message mapping
-  private readonly ERROR_MESSAGES: Record<string, string> = {
+  private ERROR_MESSAGES: Record<string, string> = {
     'UserNotFoundException': 'Invalid username or password.',
     'NotAuthorizedException': 'Invalid username or password.',
     'UserNotConfirmedException': 'Please verify your email address.',
