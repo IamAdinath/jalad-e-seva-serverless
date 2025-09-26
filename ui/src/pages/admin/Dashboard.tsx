@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import AdminHeader from "../../components/AdminHeader";
 import Footer from "../../components/Footer";
 import type { BlogPost } from "../../components/utils/types";
@@ -7,6 +8,7 @@ import { useToast } from "../../components/Toast";
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
@@ -32,13 +34,13 @@ const Dashboard: React.FC = () => {
 
       if (isLoadMore) {
         setBlogs(prevBlogs => [...prevBlogs, ...data.blogs]);
-        showSuccess(`Loaded ${data.blogs.length} more blogs`);
+        showSuccess(t('adminDashboardLoadedMore', { count: data.blogs.length }));
       } else {
         setBlogs(data.blogs);
         if (data.blogs.length === 0) {
-          showSuccess("No published blogs found");
+          showSuccess(t('adminDashboardNoBlogs'));
         } else {
-          showSuccess(`Loaded ${data.blogs.length} published blogs`);
+          showSuccess(t('adminDashboardLoadedBlogs', { count: data.blogs.length }));
         }
       }
       
@@ -46,7 +48,7 @@ const Dashboard: React.FC = () => {
       setLastKey(data.last_evaluated_key);
     } catch (error) {
       console.error("Error fetching blogs:", error);
-      showError("Failed to fetch blogs");
+      showError(t('adminErrorFetchBlogs'));
     } finally {
       if (isLoadMore) {
         setLoadingMore(false);
@@ -67,7 +69,7 @@ const Dashboard: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('adminTableNA');
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -77,18 +79,18 @@ const Dashboard: React.FC = () => {
       <div className="admin-dashboard">
         <div className="container">
           <div className="dashboard-header">
-            <h1>Published Blogs</h1>
-            <p>Manage your published blog posts</p>
+            <h1>{t('adminDashboardTitle')}</h1>
+            <p>{t('adminDashboardSubtitle')}</p>
           </div>
 
           {loading ? (
             <div className="loading-state">
-              <p>Loading blogs...</p>
+              <p>{t('adminDashboardLoading')}</p>
             </div>
           ) : blogs.length === 0 ? (
             <div className="empty-state">
-              <h3>No Published Blogs</h3>
-              <p>You haven't published any blogs yet.</p>
+              <h3>{t('adminDashboardEmpty')}</h3>
+              <p>{t('adminDashboardEmptyDesc')}</p>
             </div>
           ) : (
             <>
@@ -96,11 +98,11 @@ const Dashboard: React.FC = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Title</th>
-                      <th>Category</th>
-                      <th>Published Date</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('adminTableTitle')}</th>
+                      <th>{t('adminTableCategory')}</th>
+                      <th>{t('adminTablePublishedDate')}</th>
+                      <th>{t('adminTableStatus')}</th>
+                      <th>{t('adminTableActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -123,13 +125,13 @@ const Dashboard: React.FC = () => {
                         </td>
                         <td>
                           <span className="category-badge">
-                            {blog.category || 'General'}
+                            {blog.category ? t(blog.category) : t('adminTableGeneral')}
                           </span>
                         </td>
                         <td>{formatDate(blog.publishedAt || blog.endDate || '')}</td>
                         <td>
                           <span className="status-badge published">
-                            Published
+                            {t('adminTablePublished')}
                           </span>
                         </td>
                         <td>
@@ -138,10 +140,10 @@ const Dashboard: React.FC = () => {
                               className="btn-view"
                               onClick={() => window.open(`/blog/${blog.id}`, '_blank')}
                             >
-                              View
+                              {t('adminTableView')}
                             </button>
-                            <button className="btn-edit">Edit</button>
-                            <button className="btn-delete">Delete</button>
+                            <button className="btn-edit">{t('adminTableEdit')}</button>
+                            <button className="btn-delete">{t('adminTableDelete')}</button>
                           </div>
                         </td>
                       </tr>
@@ -157,7 +159,7 @@ const Dashboard: React.FC = () => {
                     disabled={loadingMore}
                     className="load-more-button"
                   >
-                    {loadingMore ? 'Loading...' : 'Load More Blogs'}
+                    {loadingMore ? t('adminDashboardLoading2') : t('adminDashboardLoadMore')}
                   </button>
                 </div>
               )}

@@ -27,8 +27,8 @@ const Categories: React.FC = () => {
                 onChange={(e) => changeLanguage(e.target.value)}
                 className="language-selector"
               >
-                <option value="en">English</option>
-                <option value="mr">मराठी</option>
+                <option value="en">{t('adminLanguageEnglish')}</option>
+                <option value="mr">{t('adminLanguageMarathi')}</option>
               </select>
             </div>
           </div>

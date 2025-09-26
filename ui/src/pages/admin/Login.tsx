@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/Toast';
 import Header from '../../components/Header';
@@ -7,6 +8,7 @@ import Footer from '../../components/Footer';
 import './Login.css';
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,17 +25,17 @@ const Login: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!username.trim()) {
-      showWarning('Please enter your username or email');
+      showWarning(t('adminLoginValidationUsername'));
       return false;
     }
 
     if (!password.trim()) {
-      showWarning('Please enter your password');
+      showWarning(t('adminLoginValidationPassword'));
       return false;
     }
 
     if (password.length < 6) {
-      showWarning('Password must be at least 6 characters long');
+      showWarning(t('adminLoginValidationPasswordLength'));
       return false;
     }
 
@@ -53,7 +55,7 @@ const Login: React.FC = () => {
       const result = await login(username.trim(), password);
       
       if (result.success) {
-        showSuccess('Login successful! Redirecting to dashboard...');
+        showSuccess(t('adminLoginSuccess'));
         // Small delay to show success message before redirect
         setTimeout(() => {
           navigate('/admin/dashboard');
@@ -62,28 +64,28 @@ const Login: React.FC = () => {
         // Handle specific error cases
         switch (result.errorCode) {
           case 'ACCESS_DENIED':
-            showError('Access denied. You need admin privileges to access this area.');
+            showError(t('adminLoginErrorAccess'));
             break;
           case 'UserNotFoundException':
           case 'NotAuthorizedException':
-            showError('Invalid username or password. Please check your credentials.');
+            showError(t('adminLoginErrorCredentials'));
             break;
           case 'UserNotConfirmedException':
-            showError('Please verify your email address before logging in.');
+            showError(t('adminLoginErrorVerification'));
             break;
           case 'TooManyRequestsException':
-            showError('Too many login attempts. Please wait a few minutes and try again.');
+            showError(t('adminLoginErrorTooMany'));
             break;
           case 'NEW_PASSWORD_REQUIRED':
-            showError('Password change required. Please contact your administrator.');
+            showError(t('adminLoginErrorPassword'));
             break;
           default:
-            showError(result.error || 'Login failed. Please try again.');
+            showError(result.error || t('adminLoginErrorGeneral'));
         }
       }
     } catch (error) {
       console.error('Login error:', error);
-      showError('An unexpected error occurred. Please try again.');
+      showError(t('adminLoginErrorUnexpected'));
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +99,7 @@ const Login: React.FC = () => {
         <div className="login-container">
           <div className="login-card">
             <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>Loading...</p>
+              <p>{t('adminLoginLoading')}</p>
             </div>
           </div>
         </div>
@@ -111,18 +113,18 @@ const Login: React.FC = () => {
       <Header />
       <div className="login-container">
         <div className="login-card">
-          <h2>Admin Login</h2>
-          <p className="login-subtitle">Sign in with your AWS Cognito credentials</p>
+          <h2>{t('adminLoginTitle')}</h2>
+          <p className="login-subtitle">{t('adminLoginSubtitle')}</p>
           
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="username">Username or Email</label>
+              <label htmlFor="username">{t('adminLoginUsername')}</label>
               <input
                 type="text"
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username or email"
+                placeholder={t('adminLoginUsernamePlaceholder')}
                 disabled={isLoading}
                 autoComplete="username"
                 required
@@ -130,13 +132,13 @@ const Login: React.FC = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('adminLoginPassword')}</label>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('adminLoginPasswordPlaceholder')}
                 disabled={isLoading}
                 autoComplete="current-password"
                 required
@@ -152,18 +154,18 @@ const Login: React.FC = () => {
               {isLoading ? (
                 <>
                   <span className="loading-spinner"></span>
-                  Signing in...
+                  {t('adminLoginSigningIn')}
                 </>
               ) : (
-                'Sign In'
+                t('adminLoginSignIn')
               )}
             </button>
           </form>
           
           <div className="login-info">
-            <p><strong>Admin Access Required</strong></p>
-            <p>Only users with admin privileges can access this area.</p>
-            <p>Contact your administrator if you need access.</p>
+            <p><strong>{t('adminLoginInfoTitle')}</strong></p>
+            <p>{t('adminLoginInfoDesc1')}</p>
+            <p>{t('adminLoginInfoDesc2')}</p>
           </div>
         </div>
       </div>

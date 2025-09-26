@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import AdminHeader from "../../components/AdminHeader";
 import Footer from "../../components/Footer";
 import type { BlogPost } from "../../components/utils/types";
@@ -7,6 +8,7 @@ import { useToast } from "../../components/Toast";
 import './Dashboard.css'; // Reuse the same styles
 
 const Drafts: React.FC = () => {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
@@ -32,13 +34,13 @@ const Drafts: React.FC = () => {
 
       if (isLoadMore) {
         setBlogs(prevBlogs => [...prevBlogs, ...data.blogs]);
-        showSuccess(`Loaded ${data.blogs.length} more drafts`);
+        showSuccess(t('adminDraftsLoadedMore', { count: data.blogs.length }));
       } else {
         setBlogs(data.blogs);
         if (data.blogs.length === 0) {
-          showSuccess("No draft blogs found");
+          showSuccess(t('adminDraftsNoBlogs'));
         } else {
-          showSuccess(`Loaded ${data.blogs.length} draft blogs`);
+          showSuccess(t('adminDraftsLoadedBlogs', { count: data.blogs.length }));
         }
       }
       
@@ -46,7 +48,7 @@ const Drafts: React.FC = () => {
       setLastKey(data.last_evaluated_key);
     } catch (error) {
       console.error("Error fetching drafts:", error);
-      showError("Failed to fetch draft blogs");
+      showError(t('adminErrorFetchDrafts'));
     } finally {
       if (isLoadMore) {
         setLoadingMore(false);
@@ -67,7 +69,7 @@ const Drafts: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('adminTableNA');
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -77,18 +79,18 @@ const Drafts: React.FC = () => {
       <div className="admin-dashboard">
         <div className="container">
           <div className="dashboard-header">
-            <h1>Draft Blogs</h1>
-            <p>Manage your draft blog posts</p>
+            <h1>{t('adminDraftsTitle')}</h1>
+            <p>{t('adminDraftsSubtitle')}</p>
           </div>
 
           {loading ? (
             <div className="loading-state">
-              <p>Loading drafts...</p>
+              <p>{t('adminDraftsLoading')}</p>
             </div>
           ) : blogs.length === 0 ? (
             <div className="empty-state">
-              <h3>No Draft Blogs</h3>
-              <p>You don't have any draft blogs at the moment.</p>
+              <h3>{t('adminDraftsEmpty')}</h3>
+              <p>{t('adminDraftsEmptyDesc')}</p>
             </div>
           ) : (
             <>
@@ -96,11 +98,11 @@ const Drafts: React.FC = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Title</th>
-                      <th>Category</th>
-                      <th>Created Date</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('adminTableTitle')}</th>
+                      <th>{t('adminTableCategory')}</th>
+                      <th>{t('adminTableCreatedDate')}</th>
+                      <th>{t('adminTableStatus')}</th>
+                      <th>{t('adminTableActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -123,20 +125,20 @@ const Drafts: React.FC = () => {
                         </td>
                         <td>
                           <span className="category-badge">
-                            {blog.category || 'General'}
+                            {blog.category ? t(blog.category) : t('adminTableGeneral')}
                           </span>
                         </td>
                         <td>{formatDate(blog.startDate || '')}</td>
                         <td>
                           <span className="status-badge draft">
-                            Draft
+                            {t('adminTableDraft')}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
-                            <button className="btn-edit">Edit</button>
-                            <button className="btn-view">Publish</button>
-                            <button className="btn-delete">Delete</button>
+                            <button className="btn-edit">{t('adminTableEdit')}</button>
+                            <button className="btn-view">{t('adminTablePublish')}</button>
+                            <button className="btn-delete">{t('adminTableDelete')}</button>
                           </div>
                         </td>
                       </tr>
@@ -152,7 +154,7 @@ const Drafts: React.FC = () => {
                     disabled={loadingMore}
                     className="load-more-button"
                   >
-                    {loadingMore ? 'Loading...' : 'Load More Drafts'}
+                    {loadingMore ? t('adminDashboardLoading2') : t('adminDraftsLoadMore')}
                   </button>
                 </div>
               )}
