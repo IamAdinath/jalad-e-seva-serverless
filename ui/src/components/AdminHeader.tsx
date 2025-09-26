@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from './Toast';
+import LanguageSwitcher from './LanguageSwitcher';
 import logo from '../assets/images/logoindia.png';
 import './AdminHeader.css';
 
 const AdminHeader: React.FC = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const { logout, user } = useAuth();
@@ -27,11 +30,11 @@ const AdminHeader: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      showSuccess('Logged out successfully');
+      showSuccess(t('adminLogoutSuccess'));
       navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
-      showSuccess('Logged out successfully'); // Still show success as user is logged out locally
+      showSuccess(t('adminLogoutSuccess')); // Still show success as user is logged out locally
       navigate('/');
     }
   };
@@ -48,9 +51,16 @@ const AdminHeader: React.FC = () => {
 
           {/* NAVIGATION LINKS */}
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
-            <li><Link to="/admin/dashboard">Published Blogs</Link></li>
-            <li><Link to="/admin/drafts">Draft Blogs</Link></li>
-            <li><Link to="/admin/new-blog">New Blog</Link></li>
+            <li><Link to="/admin/dashboard">{t('adminNavPublishedBlogs')}</Link></li>
+            <li><Link to="/admin/drafts">{t('adminNavDraftBlogs')}</Link></li>
+            <li><Link to="/admin/new-blog">{t('adminNavNewBlog')}</Link></li>
+            <li><Link to="/admin/categories">{t('adminNavCategories')}</Link></li>
+            
+            {/* LANGUAGE SWITCHER */}
+            <li className="nav-translate">
+              <LanguageSwitcher />
+            </li>
+            
             {user && (
               <li className="user-info">
                 <span className="user-name">
@@ -60,7 +70,7 @@ const AdminHeader: React.FC = () => {
             )}
             <li>
               <button onClick={handleLogout} className="logout-button">
-                Logout
+                {t('adminNavLogout')}
               </button>
             </li>
           </ul>
