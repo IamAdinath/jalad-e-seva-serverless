@@ -254,7 +254,7 @@ export class CognitoAuthService {
   /**
    * Extract user data from Cognito session
    */
-  private async extractUserData(session: AmazonCognitoIdentity.CognitoUserSession, cognitoUser: AmazonCognitoIdentity.CognitoUser): Promise<CognitoUserData> {
+  private async extractUserData(session: AmazonCognitoIdentity.CognitoUserSession, _cognitoUser: AmazonCognitoIdentity.CognitoUser): Promise<CognitoUserData> {
     const accessToken = session.getAccessToken();
     const idToken = session.getIdToken();
     const refreshToken = session.getRefreshToken();

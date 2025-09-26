@@ -1,8 +1,8 @@
 // Polyfills for amazon-cognito-identity-js in Vite/browser environment
 
 // Global polyfill
-if (typeof global === 'undefined') {
-  (window as any).global = window;
+if (typeof (globalThis as any).global === 'undefined') {
+  (globalThis as any).global = globalThis;
 }
 
 // Process polyfill
