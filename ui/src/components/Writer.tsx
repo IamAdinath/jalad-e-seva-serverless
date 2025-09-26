@@ -123,7 +123,7 @@ const Writer: React.FC = () => {
       return;
     }
     if (!category) {
-      showWarning('Please select a category.');
+      showWarning(t('writerValidationCategory'));
       return;
     }
 

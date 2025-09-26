@@ -96,6 +96,18 @@
   "ctgNGOs": "NGOs",
   "ctgOthers": "इतर",
 
+  "adminNavPublishedBlogs": "प्रकाशित ब्लॉग",
+  "adminNavDraftBlogs": "मसुदा ब्लॉग",
+  "adminNavNewBlog": "नवीन ब्लॉग",
+  "adminNavCategories": "श्रेणी",
+  "adminNavLogout": "लॉग आउट",
+  "adminLogoutSuccess": "यशस्वीरित्या लॉग आउट झाले",
+  "adminCategoriesTitle": "उपलब्ध श्रेणी",
+  "adminCategoriesDescription": "श्रेणी भाषांतर फाइलद्वारे व्यवस्थापित केल्या जातात. श्रेणी जोडण्यासाठी किंवा सुधारण्यासाठी, भाषांतर फाइल अपडेट करा",
+  "adminCategoryKey": "भाषांतर की",
+  "adminCategoryUsage": "ब्लॉग पोस्ट वर्गीकृत करण्यासाठी ही की वापरा.",
+  "writerValidationCategory": "कृपया श्रेणी निवडा.",
+
   "BloglistTitle": "नवीनतम ब्लॉग पोस्ट",
   "BloglistDescription": "सरकारी योजना, नोकऱ्या आणि सेवांवरीलचे आमचे ताजे विचार आणि अद्यतने वाचा.",
   "BloglistReadMore": "अधिक वाचा",

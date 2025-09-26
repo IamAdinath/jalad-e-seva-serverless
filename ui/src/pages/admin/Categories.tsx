@@ -20,7 +20,7 @@ const Categories: React.FC = () => {
       <div className="admin-categories">
         <div className="container">
           <div className="categories-header">
-            <h1>Available Categories</h1>
+            <h1>{t('adminCategoriesTitle')}</h1>
             <div className="header-actions">
               <select 
                 value={i18n.language} 
@@ -35,8 +35,7 @@ const Categories: React.FC = () => {
 
           <div className="categories-info">
             <p>
-              Categories are managed through translation files. To add or modify categories, 
-              update the translation files in <code>ui/public/locales/</code>.
+              {t('adminCategoriesDescription')} <code>ui/public/locales/</code>.
             </p>
           </div>
 
@@ -49,10 +48,10 @@ const Categories: React.FC = () => {
                 
                 <div className="category-content">
                   <p className="category-key">
-                    <strong>Translation Key:</strong> {category.key}
+                    <strong>{t('adminCategoryKey')}:</strong> {category.key}
                   </p>
                   <p className="category-usage">
-                    Use this key in blog posts to categorize content.
+                    {t('adminCategoryUsage')}
                   </p>
                 </div>
               </div>

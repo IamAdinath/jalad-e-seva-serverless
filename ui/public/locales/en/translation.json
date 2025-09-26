@@ -95,6 +95,18 @@
   "ctgNGOs": "NGOs",
   "ctgOthers": "Others",
 
+  "adminNavPublishedBlogs": "Published Blogs",
+  "adminNavDraftBlogs": "Draft Blogs", 
+  "adminNavNewBlog": "New Blog",
+  "adminNavCategories": "Categories",
+  "adminNavLogout": "Logout",
+  "adminLogoutSuccess": "Logged out successfully",
+  "adminCategoriesTitle": "Available Categories",
+  "adminCategoriesDescription": "Categories are managed through translation files. To add or modify categories, update the translation files in",
+  "adminCategoryKey": "Translation Key",
+  "adminCategoryUsage": "Use this key in blog posts to categorize content.",
+  "writerValidationCategory": "Please select a category.",
+
   "BloglistTitle": "Latest Blog Posts",
   "BloglistDescription": "Read our latest insights and updates on government schemes, jobs, and services.",
   "BloglistReadMore": "Read More",
