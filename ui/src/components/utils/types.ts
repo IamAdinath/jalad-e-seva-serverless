@@ -59,3 +59,8 @@ export interface GetBlogsResponse {
     has_more: boolean;
     last_evaluated_key?: string;
 }
+
+export interface Category {
+    key: string;            // Translation key (e.g., "ctgTechnology")
+    name: string;           // Translated name (resolved from translation files)
+}

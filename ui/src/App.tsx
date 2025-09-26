@@ -13,6 +13,7 @@ import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import Drafts from './pages/admin/Drafts';
 import NewBlog from './pages/admin/NewBlog';
+import Categories from './pages/admin/Categories';
 
 
 const AdminRedirect: React.FC = () => {
@@ -49,6 +50,11 @@ function App() {
                 <Route path="/admin/new-blog" element={
                   <ProtectedRoute>
                     <NewBlog />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/categories" element={
+                  <ProtectedRoute>
+                    <Categories />
                   </ProtectedRoute>
                 } />
                 

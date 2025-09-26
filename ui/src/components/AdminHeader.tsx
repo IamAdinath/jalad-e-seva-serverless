@@ -51,6 +51,7 @@ const AdminHeader: React.FC = () => {
             <li><Link to="/admin/dashboard">Published Blogs</Link></li>
             <li><Link to="/admin/drafts">Draft Blogs</Link></li>
             <li><Link to="/admin/new-blog">New Blog</Link></li>
+            <li><Link to="/admin/categories">Categories</Link></li>
             {user && (
               <li className="user-info">
                 <span className="user-name">

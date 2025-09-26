@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { createBlog, uploadToS3 } from './utils/apis';
 import type { CreateBlogPost } from './utils/types';
 import { useToast } from './Toast';
+import CategoryDropdown from './CategoryDropdown';
 import './Writer.css';
 
 // MenuBar component remains unchanged
@@ -48,7 +49,7 @@ const Writer: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [category, setCategory] = useState('general');
+  const [category, setCategory] = useState('');
   const [submissionStatus, setSubmissionStatus] = useState<'published' | 'draft' | null>(null);
 
   const editor = useEditor({
@@ -121,6 +122,10 @@ const Writer: React.FC = () => {
       showWarning('Start date cannot be after End date.');
       return;
     }
+    if (!category) {
+      showWarning('Please select a category.');
+      return;
+    }
 
     setSubmissionStatus(status);
 
@@ -177,7 +182,7 @@ const Writer: React.FC = () => {
       setPreviewUrl(null);
       setStartDate('');
       setEndDate('');
-      setCategory('general');
+      setCategory('');
       editor?.commands.clearContent();
 
       // Redirect to admin dashboard if accessed from admin route
@@ -230,11 +235,12 @@ const Writer: React.FC = () => {
           </div>
           <div className="form-group">
             <label htmlFor="category">{t('writerCategorySelect')}</label>
-            <select id="category" className="form-input" value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="general">{t('writerCategoryGeneral')}</option>
-              <option value="news">{t('writerCategoryNews')}</option>
-              <option value="updates">{t('writerCategoryUpdates')}</option>
-            </select>
+            <CategoryDropdown
+              value={category}
+              onChange={setCategory}
+              required
+              className="form-input"
+            />
           </div>
         </div>
       </div>
