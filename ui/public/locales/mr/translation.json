@@ -97,7 +97,7 @@
   "ctgOthers": "इतर",
 
   "adminNavPublishedBlogs": "प्रकाशित ब्लॉग",
-  "adminNavDraftBlogs": "मसुदा ब्लॉग",
+  "adminNavDraftBlogs": "ड्राफ्ट ब्लॉग",
   "adminNavNewBlog": "नवीन ब्लॉग",
   "adminNavCategories": "श्रेणी",
   "adminNavLogout": "लॉग आउट",
@@ -119,14 +119,14 @@
   "adminDashboardLoadMore": "अधिक ब्लॉग लोड करा",
   "adminDashboardLoading2": "लोड करत आहे...",
 
-  "adminDraftsTitle": "मसुदा ब्लॉग",
-  "adminDraftsSubtitle": "तुमच्या मसुदा ब्लॉग पोस्ट व्यवस्थापित करा",
+  "adminDraftsTitle": "ड्राफ्ट ब्लॉग",
+  "adminDraftsSubtitle": "तुमच्या ड्राफ्ट ब्लॉग पोस्ट व्यवस्थापित करा",
   "adminDraftsLoading": "मसुदे लोड करत आहे...",
-  "adminDraftsEmpty": "कोणतेही मसुदा ब्लॉग नाहीत",
-  "adminDraftsEmptyDesc": "तुमच्याकडे सध्या कोणतेही मसुदा ब्लॉग नाहीत.",
-  "adminDraftsLoadedBlogs": "{count} मसुदा ब्लॉग लोड केले",
+  "adminDraftsEmpty": "कोणतेही ड्राफ्ट ब्लॉग नाहीत",
+  "adminDraftsEmptyDesc": "तुमच्याकडे सध्या कोणतेही ड्राफ्ट ब्लॉग नाहीत.",
+  "adminDraftsLoadedBlogs": "{count} ड्राफ्ट ब्लॉग लोड केले",
   "adminDraftsLoadedMore": "{count} अधिक मसुदे लोड केले",
-  "adminDraftsNoBlogs": "कोणतेही मसुदा ब्लॉग सापडले नाहीत",
+  "adminDraftsNoBlogs": "कोणतेही ड्राफ्ट ब्लॉग सापडले नाहीत",
   "adminDraftsLoadMore": "अधिक मसुदे लोड करा",
 
   "adminTableTitle": "शीर्षक",
@@ -137,7 +137,7 @@
   "adminTableActions": "क्रिया",
   "adminTableGeneral": "सामान्य",
   "adminTablePublished": "प्रकाशित",
-  "adminTableDraft": "मसुदा",
+  "adminTableDraft": "ड्राफ्ट",
   "adminTableView": "पहा",
   "adminTableEdit": "संपादित करा",
   "adminTableDelete": "हटवा",
@@ -170,7 +170,7 @@
   "adminLoginErrorUnexpected": "एक अनपेक्षित त्रुटी आली. कृपया पुन्हा प्रयत्न करा.",
 
   "adminErrorFetchBlogs": "ब्लॉग आणण्यात अयशस्वी",
-  "adminErrorFetchDrafts": "मसुदा ब्लॉग आणण्यात अयशस्वी",
+  "adminErrorFetchDrafts": "ड्राफ्ट ब्लॉग आणण्यात अयशस्वी",
   "adminLanguageEnglish": "English",
   "adminLanguageMarathi": "मराठी",
 
