@@ -6,14 +6,12 @@ import Footer from "../components/Footer";
 import type { BlogPost } from "../components/utils/types";
 import { getBlogsbyCategory } from "../components/utils/apis";
 import { useToast } from "../components/Toast";
-import { useTranslation } from "react-i18next";
 
 const CategoryBlogs: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { showError, showSuccess, showInfo } = useToast();
-  const { t } = useTranslation();
 
   useEffect(() => {
     console.log("CategoryBlogs useEffect triggered with category:", category);

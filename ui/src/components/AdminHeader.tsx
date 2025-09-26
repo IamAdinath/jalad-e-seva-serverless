@@ -59,6 +59,8 @@ const AdminHeader: React.FC = () => {
               <LanguageSwitcher />
             </li>
 
+            <li><Link to="/admin/dashboard">{user?.email}</Link></li>
+
             <li>
               <button onClick={handleLogout} className="logout-button">
                 {t('adminNavLogout')}
