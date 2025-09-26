@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import type { BlogPost } from "../components/utils/types";
 import { getBlogs } from "../components/utils/apis";
 import { useToast } from "../components/Toast";
+import { useTranslation } from "react-i18next";
 
 const AllBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -14,6 +15,7 @@ const AllBlogs: React.FC = () => {
   const [lastKey, setLastKey] = useState<string | undefined>(undefined);
   const [loadingMore, setLoadingMore] = useState(false);
   const { showError, showSuccess, showInfo } = useToast();
+  const { t } = useTranslation();
 
   const fetchBlogs = async (isLoadMore = false) => {
     if (isLoadMore) {
@@ -49,7 +51,7 @@ const AllBlogs: React.FC = () => {
       setLastKey(data.last_evaluated_key);
     } catch (error) {
       console.error("Error fetching blogs:", error);
-      const errorMessage = "Failed to fetch blogs";
+      const errorMessage = t('fetchBlogsError');
       setError(errorMessage);
       showError(errorMessage);
     } finally {

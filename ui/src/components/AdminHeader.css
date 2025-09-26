@@ -46,7 +46,7 @@
 }
 
 .admin-header .nav-links {
-  display: flex;
+  display: contents;
   list-style: none;
   margin: 0;
   padding: 0;

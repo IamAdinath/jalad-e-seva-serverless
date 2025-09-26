@@ -43,31 +43,22 @@ const AdminHeader: React.FC = () => {
     <header className={isSticky ? 'admin-header sticky' : 'admin-header'}>
       <div className="container">
         <nav className="navbar">
-          {/* LOGO */}
+
           <Link to="/admin/dashboard" className="logo">
             <img src={logo} alt="e-Seva Logo" className="logo-img" />
             <span className="logo-text">e-Seva Admin</span>
           </Link>
 
-          {/* NAVIGATION LINKS */}
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><Link to="/admin/dashboard">{t('adminNavPublishedBlogs')}</Link></li>
             <li><Link to="/admin/drafts">{t('adminNavDraftBlogs')}</Link></li>
             <li><Link to="/admin/new-blog">{t('adminNavNewBlog')}</Link></li>
             <li><Link to="/admin/categories">{t('adminNavCategories')}</Link></li>
             
-            {/* LANGUAGE SWITCHER */}
             <li className="nav-translate">
               <LanguageSwitcher />
             </li>
-            
-            {user && (
-              <li className="user-info">
-                <span className="user-name">
-                  {user.email || user.username}
-                </span>
-              </li>
-            )}
+
             <li>
               <button onClick={handleLogout} className="logout-button">
                 {t('adminNavLogout')}
