@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { BlogPost } from "../components/utils/types";
 import { getBlogs } from "../components/utils/apis";
+import { useToast } from "../components/Toast";
 
 const AllBlogs: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -12,6 +13,7 @@ const AllBlogs: React.FC = () => {
   const [hasMore, setHasMore] = useState(false);
   const [lastKey, setLastKey] = useState<string | undefined>(undefined);
   const [loadingMore, setLoadingMore] = useState(false);
+  const { showError, showSuccess, showInfo } = useToast();
 
   const fetchBlogs = async (isLoadMore = false) => {
     if (isLoadMore) {
@@ -27,20 +29,29 @@ const AllBlogs: React.FC = () => {
       
       if ('error' in data) {
         setError(data.error);
+        showError(data.error);
         return;
       }
 
       if (isLoadMore) {
         setBlogs(prevBlogs => [...prevBlogs, ...data.blogs]);
+        showSuccess(`Loaded ${data.blogs.length} more blogs`);
       } else {
         setBlogs(data.blogs);
+        if (data.blogs.length === 0) {
+          showInfo("No blogs found");
+        } else {
+          showSuccess(`Loaded ${data.blogs.length} blogs`);
+        }
       }
       
       setHasMore(data.has_more);
       setLastKey(data.last_evaluated_key);
     } catch (error) {
       console.error("Error fetching blogs:", error);
-      setError("Failed to fetch blogs");
+      const errorMessage = "Failed to fetch blogs";
+      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       if (isLoadMore) {
         setLoadingMore(false);

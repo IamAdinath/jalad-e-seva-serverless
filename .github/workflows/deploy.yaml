@@ -34,6 +34,10 @@ jobs:
       STACK_NAME: ${{ vars.DEV_UI_STACK_NAME }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
       VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
+      VITE_COGNITO_USER_POOL_ID: ${{ vars.DEV_COGNITO_USER_POOL_ID }}
+      VITE_COGNITO_USER_POOL_WEB_CLIENT_ID: ${{ vars.DEV_COGNITO_USER_POOL_WEB_CLIENT_ID }}
+      VITE_COGNITO_REGION: ${{ vars.DEV_COGNITO_REGION }}
+      VITE_COGNITO_IDENTITY_POOL_ID: ${{ vars.DEV_COGNITO_IDENTITY_POOL_ID }}
 
     steps:
       - name: Checkout code
@@ -81,6 +85,10 @@ jobs:
         working-directory: ui
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
+          VITE_COGNITO_USER_POOL_ID: ${{ env.VITE_COGNITO_USER_POOL_ID }}
+          VITE_COGNITO_USER_POOL_WEB_CLIENT_ID: ${{ env.VITE_COGNITO_USER_POOL_WEB_CLIENT_ID }}
+          VITE_COGNITO_REGION: ${{ env.VITE_COGNITO_REGION }}
+          VITE_COGNITO_IDENTITY_POOL_ID: ${{ env.VITE_COGNITO_IDENTITY_POOL_ID }}
         run: |
           npm install --legacy-peer-deps
           npm run build
@@ -133,6 +141,10 @@ jobs:
       SSLCertArn: ${{ vars.PROD_UI_SSL_CERT_ARN }}
       Hostname: ${{ vars.PROD_UI_HOSTNAME }}
       VITE_API_URL: ${{ vars.VITE_API_URL_PROD }}
+      VITE_COGNITO_USER_POOL_ID: ${{ vars.PROD_COGNITO_USER_POOL_ID }}
+      VITE_COGNITO_USER_POOL_WEB_CLIENT_ID: ${{ vars.PROD_COGNITO_USER_POOL_WEB_CLIENT_ID }}
+      VITE_COGNITO_REGION: ${{ vars.PROD_COGNITO_REGION }}
+      VITE_COGNITO_IDENTITY_POOL_ID: ${{ vars.PROD_COGNITO_IDENTITY_POOL_ID }}
 
     steps:
       - name: Checkout code
@@ -182,6 +194,10 @@ jobs:
         working-directory: ui
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
+          VITE_COGNITO_USER_POOL_ID: ${{ env.VITE_COGNITO_USER_POOL_ID }}
+          VITE_COGNITO_USER_POOL_WEB_CLIENT_ID: ${{ env.VITE_COGNITO_USER_POOL_WEB_CLIENT_ID }}
+          VITE_COGNITO_REGION: ${{ env.VITE_COGNITO_REGION }}
+          VITE_COGNITO_IDENTITY_POOL_ID: ${{ env.VITE_COGNITO_IDENTITY_POOL_ID }}
         run: |
           npm install --legacy-peer-deps
           npm run build

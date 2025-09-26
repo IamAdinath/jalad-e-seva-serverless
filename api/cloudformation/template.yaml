@@ -436,6 +436,12 @@ Outputs:
   CognitoUserPoolId:
     Description: "Cognito User Pool ID"
     Value: !Ref jaladUserPool
+  CognitoUserPoolClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref jaladUserPoolClient
   CognitoIdentityPoolId:
     Description: "Cognito Identity Pool ID"
     Value: !Ref jaladIdentityPool
+  CognitoRegion:
+    Description: "AWS Region for Cognito"
+    Value: !Ref AWS::Region

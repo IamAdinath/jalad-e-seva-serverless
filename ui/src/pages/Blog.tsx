@@ -7,9 +7,11 @@ import type { BlogPost } from '../components/utils/types';
 import Header from '../components/Header';
 import BlogReader from '../components/ReadBlog';
 import Footer from '../components/Footer';
+import { useToast } from '../components/Toast';
 
 const Blog = () => {
   const { id } = useParams<{ id: string }>();
+  const { showError, showSuccess } = useToast();
 
   // State for the blog post
   const [blog, setBlog] = useState<BlogPost | undefined>(undefined);
@@ -37,9 +39,11 @@ const Blog = () => {
         // It's an APIErrorResponse
         setError(fetchedBlog.error);
         setBlog(undefined); // Ensure no old blog data is shown
+        showError(fetchedBlog.error);
       } else {
         // It's a successful BlogPost
         setBlog(fetchedBlog);
+        showSuccess('Blog loaded successfully');
       }
       
       setLoading(false);

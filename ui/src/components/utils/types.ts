@@ -39,6 +39,8 @@ export interface BlogPost {
     startDate?: string;
     endDate?: string;
     category?: string;
+    publishedAt?: string;
+    status?: string;
 }
 
 export interface DefaultResponse {

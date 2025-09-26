@@ -15,10 +15,10 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, loading = false }) => {
   return (
     <section className="blog-list-section">
       <div className="container">
-        <div className="section-heading">
+        {/* <div className="section-heading">
           <h2>{t("BloglistTitle")}</h2>
           <p>{t("BloglistDescription")}</p>
-        </div>
+        </div> */}
 
         {loading ? (
           <p>{t("Loading")}...</p>

@@ -5,11 +5,13 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { BlogPost } from "../components/utils/types";
 import { getBlogsbyCategory } from "../components/utils/apis";
+import { useToast } from "../components/Toast";
 
 const CategoryBlogs: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const { showError, showSuccess, showInfo } = useToast();
 
   useEffect(() => {
     console.log("CategoryBlogs useEffect triggered with category:", category);
@@ -28,14 +30,21 @@ const CategoryBlogs: React.FC = () => {
         if (Array.isArray(data)) {
           console.log("Setting blogs:", data.length, "items");
           setBlogs(data);
+          if (data.length === 0) {
+            showInfo(`No blogs found in ${category} category`);
+          } else {
+            showSuccess(`Found ${data.length} blogs in ${category} category`);
+          }
         } else {
           console.error("Error fetching blogs - not an array:", data);
-          setBlogs([]); // Set empty array if no blogs found
+          setBlogs([]);
+          showError(data.error || `Failed to fetch blogs for ${category} category`);
         }
       })
       .catch((error) => {
         console.error("Error fetching blogs - catch block:", error);
-        setBlogs([]); // Set empty array on error
+        setBlogs([]);
+        showError(`Failed to fetch blogs for ${category} category`);
       })
       .finally(() => {
         console.log("Setting loading to false");

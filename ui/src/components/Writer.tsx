@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
 import { createBlog, uploadToS3 } from './utils/apis';
 import type { CreateBlogPost } from './utils/types';
+import { useToast } from './Toast';
 import './Writer.css';
 
 // MenuBar component remains unchanged
@@ -35,6 +37,10 @@ const getFileExtension = (filename: string): string => {
 
 const Writer: React.FC = () => {
   const { t } = useTranslation();
+  const { showSuccess, showError, showWarning, showInfo } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.includes('/admin');
 
   // --- Component State ---
   const [title, setTitle] = useState('');
@@ -63,11 +69,25 @@ const Writer: React.FC = () => {
 
   const handleFileChange = useCallback((file: File | null) => {
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file.');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        showError('Image file size must be less than 5MB.');
+        return;
+      }
+      
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setThumbnail(file);
       setPreviewUrl(URL.createObjectURL(file));
+      showInfo(`Image "${file.name}" selected successfully.`);
     }
-  }, [previewUrl]);
+  }, [previewUrl, showError, showInfo]);
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -81,11 +101,26 @@ const Writer: React.FC = () => {
   // --- UPDATED SUBMISSION LOGIC ---
   const handleSubmit = async (status: 'published' | 'draft') => {
     // 1. --- Form Validation ---
-    if (!title.trim()) return alert('Title cannot be empty.');
-    if (!editor || editor.getText().trim() === '') return alert('Content cannot be empty.');
-    if (!thumbnail) return alert('A thumbnail image is required.');
-    if (!startDate || !endDate) return alert('Start and End dates are required.');
-    if (new Date(startDate) > new Date(endDate)) return alert('Start date cannot be after End date.');
+    if (!title.trim()) {
+      showWarning('Title cannot be empty.');
+      return;
+    }
+    if (!editor || editor.getText().trim() === '') {
+      showWarning('Content cannot be empty.');
+      return;
+    }
+    if (!thumbnail) {
+      showWarning('A thumbnail image is required.');
+      return;
+    }
+    if (!startDate || !endDate) {
+      showWarning('Start and End dates are required.');
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      showWarning('Start date cannot be after End date.');
+      return;
+    }
 
     setSubmissionStatus(status);
 
@@ -134,12 +169,28 @@ const Writer: React.FC = () => {
         throw new Error("Blog post was saved, but the image upload failed.");
       }
       
-      alert(`Blog post saved as ${status} successfully!`);
+      showSuccess(`Blog post saved as ${status} successfully!`);
+      
+      // Reset form after successful submission
+      setTitle('');
+      setThumbnail(null);
+      setPreviewUrl(null);
+      setStartDate('');
+      setEndDate('');
+      setCategory('general');
+      editor?.commands.clearContent();
+
+      // Redirect to admin dashboard if accessed from admin route
+      if (isAdminRoute) {
+        setTimeout(() => {
+          navigate('/admin/dashboard');
+        }, 2000); // Give time for user to see success message
+      }
 
     } catch (error) {
       // 4. --- Error Handling ---
       console.error(`Failed to save blog as ${status}:`, error);
-      alert((error as Error).message);
+      showError((error as Error).message);
     } finally {
       // 5. --- Final Step: Re-enable the UI ---
       setSubmissionStatus(null);
