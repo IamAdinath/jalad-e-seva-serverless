@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,9 @@ const getFileExtension = (filename: string): string => {
 const Writer: React.FC = () => {
   const { t } = useTranslation();
   const { showSuccess, showError, showWarning, showInfo } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.includes('/admin');
 
   // --- Component State ---
   const [title, setTitle] = useState('');
@@ -175,6 +179,13 @@ const Writer: React.FC = () => {
       setEndDate('');
       setCategory('general');
       editor?.commands.clearContent();
+
+      // Redirect to admin dashboard if accessed from admin route
+      if (isAdminRoute) {
+        setTimeout(() => {
+          navigate('/admin/dashboard');
+        }, 2000); // Give time for user to see success message
+      }
 
     } catch (error) {
       // 4. --- Error Handling ---
