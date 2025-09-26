@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from './Toast';
+import LanguageSwitcher from './LanguageSwitcher';
 import logo from '../assets/images/logoindia.png';
 import './AdminHeader.css';
 
@@ -52,6 +53,12 @@ const AdminHeader: React.FC = () => {
             <li><Link to="/admin/drafts">Draft Blogs</Link></li>
             <li><Link to="/admin/new-blog">New Blog</Link></li>
             <li><Link to="/admin/categories">Categories</Link></li>
+            
+            {/* LANGUAGE SWITCHER */}
+            <li className="nav-translate">
+              <LanguageSwitcher />
+            </li>
+            
             {user && (
               <li className="user-info">
                 <span className="user-name">
