@@ -1,13 +1,6 @@
-import {
-  CognitoUserPool,
-  CognitoUser,
-  AuthenticationDetails,
-  CognitoUserSession,
-  CognitoAccessToken,
-  CognitoIdToken,
-  CognitoRefreshToken,
-} from 'amazon-cognito-identity-js';
+import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import type { CognitoConfig } from '../config/cognito';
+import type { CognitoUserSession } from 'amazon-cognito-identity-js';
 
 export interface AuthResult {
   success: boolean;
@@ -50,8 +43,8 @@ export class AuthError extends Error {
 }
 
 export class CognitoAuthService {
-  private userPool: CognitoUserPool;
-  private currentUser: CognitoUser | null = null;
+  private userPool: AmazonCognitoIdentity.CognitoUserPool;
+  private currentUser: AmazonCognitoIdentity.CognitoUser | null = null;
   private readonly STORAGE_KEY = 'cognito_auth';
 
   // Error message mapping
@@ -69,7 +62,7 @@ export class CognitoAuthService {
   };
 
   constructor(config: CognitoConfig) {
-    this.userPool = new CognitoUserPool({
+    this.userPool = new AmazonCognitoIdentity.CognitoUserPool({
       UserPoolId: config.userPoolId,
       ClientId: config.userPoolWebClientId,
     });
@@ -80,18 +73,18 @@ export class CognitoAuthService {
    */
   async signIn(username: string, password: string): Promise<AuthResult> {
     return new Promise((resolve) => {
-      const authenticationDetails = new AuthenticationDetails({
+      const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
         Username: username,
         Password: password,
       });
 
-      const cognitoUser = new CognitoUser({
+      const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
         Username: username,
         Pool: this.userPool,
       });
 
       cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: async (session: CognitoUserSession) => {
+        onSuccess: async (session: AmazonCognitoIdentity.CognitoUserSession) => {
           try {
             this.currentUser = cognitoUser;
             const userData = await this.extractUserData(session, cognitoUser);
@@ -212,7 +205,7 @@ export class CognitoAuthService {
         return;
       }
 
-      cognitoUser.getSession((error: any, session: CognitoUserSession | null) => {
+      cognitoUser.getSession((error: any, session: AmazonCognitoIdentity.CognitoUserSession | null) => {
         if (error || !session) {
           resolve(false);
           return;
@@ -261,7 +254,7 @@ export class CognitoAuthService {
   /**
    * Extract user data from Cognito session
    */
-  private async extractUserData(session: CognitoUserSession, cognitoUser: CognitoUser): Promise<CognitoUserData> {
+  private async extractUserData(session: AmazonCognitoIdentity.CognitoUserSession, cognitoUser: AmazonCognitoIdentity.CognitoUser): Promise<CognitoUserData> {
     const accessToken = session.getAccessToken();
     const idToken = session.getIdToken();
     const refreshToken = session.getRefreshToken();
