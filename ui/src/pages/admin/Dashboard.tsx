@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
         if (data.blogs.length === 0) {
           showSuccess(t('adminDashboardNoBlogs'));
         } else {
-          showSuccess(t('adminDashboardLoadedBlogs', { count: data.blogs.length }));
+          showSuccess(t('adminDashboardLoadedBlogs'));
         }
       }
       

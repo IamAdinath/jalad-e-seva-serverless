@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
             <ul>
               <li><a href="/privacy-policy">{t('footerPrivacy')}</a></li>
               <li><a href="/terms-of-service">{t('footerTerms')}</a></li>
-              <li><a href="/admin/login">Admin</a></li>
+              <li><a href="/admin/login">{t('navAdmin')}</a></li>
             </ul>
           </div>
 

@@ -19,6 +19,7 @@
   "navTechnology": "Technology",
   "navFinance": "Finance",
   "navOthers": "Others",
+  "navAdmin": "Admin",
 
   "navHealth": "Health",
   "navEducation": "Education",
@@ -112,7 +113,7 @@
   "adminDashboardLoading": "Loading blogs...",
   "adminDashboardEmpty": "No Published Blogs",
   "adminDashboardEmptyDesc": "You haven't published any blogs yet.",
-  "adminDashboardLoadedBlogs": "Loaded {count} published blogs",
+  "adminDashboardLoadedBlogs": "Published blogs loaded",
   "adminDashboardLoadedMore": "Loaded {count} more blogs",
   "adminDashboardNoBlogs": "No published blogs found",
   "adminDashboardLoadMore": "Load More Blogs",

@@ -88,7 +88,7 @@ def lambda_handler(event, context):
             return build_response(
                 StatusCodes.OK,
                 Headers.DEFAULT,
-                {"blogs": [], "message": "No blogs found.", "query_params": query_params, "table_items_count": scan_response.get("Count", 0)},
+                {"blogs": [], "message": "No blogs found.", "table_items_count": scan_response.get("Count", 0)},
             )
 
         formatted_blogs = []
