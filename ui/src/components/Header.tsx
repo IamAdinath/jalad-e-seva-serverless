@@ -42,10 +42,10 @@ const Header: React.FC = () => {
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><Link to="/">{t('navHome')}</Link></li>
             <li><Link to="/Schemes">{t('navSchemes')}</Link></li>
-            <li><Link to="/Jobs">{t('navJobs')}</Link></li>
-            <li><Link to="/Services">{t('navBusinesses')}</Link></li>
-            <li><Link to="/Students">{t('navStudents')}</Link></li>
-            <li><Link to="/Farmers">{t('navFarmers')}</Link></li>
+            <li><Link to="/Jobs">{t('ctgJobs')}</Link></li>
+            <li><Link to="/Services">{t('ctgServices')}</Link></li>
+            <li><Link to="/Education">{t('ctgEducation')}</Link></li>
+            <li><Link to="/Agriculture">{t('ctgAgriculture')}</Link></li>
             
             {/* ADD THE LANGUAGE SWITCHER HERE */}
             <li className="nav-translate">

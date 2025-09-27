@@ -6,7 +6,6 @@
   "navHome": "Home",
   "navSchemes": "Schemes",
   "navJobs": "Jobs",
-  "navStudents": "Student",
   "navBusinesses": "Businesses",
   "navIndividuals": "Individuals",
   "navNews": "News",
@@ -21,14 +20,6 @@
   "navOthers": "Others",
   "navAdmin": "Admin",
 
-  "navHealth": "Health",
-  "navEducation": "Education",
-  "navTransport": "Transport",
-  "navTourism": "Tourism",
-  "navAgriculture": "Agriculture",
-  "navEnvironment": "Environment",
-
-  "navFarmers": "Farmers",
   "navSignUp": "SignUp",
   "navLogin": "Login",
   "navLogout": "Logout",
@@ -80,9 +71,10 @@
 
   "ctgSchemes": "Schemes",
   "ctgJobs": "Jobs",
-  "ctgEducation": "Education",
-  "ctgHealth": "Health",
   "ctgAgriculture": "Agriculture",
+  "ctgEducation": "Education",
+  "ctgServices": "Services",
+  "ctgHealth": "Health",
   "ctgBusiness": "Business",
   "ctgTechnology": "Technology",
   "ctgFinance": "Finance",
@@ -229,5 +221,8 @@
   "messageBlogSummaryGenerated": "Auto-generated summary created successfully.",
   "messageBlogSummaryError": "Error generating summary. Please try again later.",
   "messageBlogCategoryNotFound": "Blog post category not found.",
-  "messageBlogImageInvalid": "Invalid image. Please use JPEG, PNG, or GIF format."
+  "messageBlogImageInvalid": "Invalid image. Please use JPEG, PNG, or GIF format.",
+  
+  "marqueeStayTuned": "Stay tuned for the latest updates",
+  "marqueeNoRecentUpdates": "No recent updates available"
 }
