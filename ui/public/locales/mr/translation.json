@@ -110,6 +110,17 @@
   "ctgGovernmentDescription": "सरकारी सेवा, धोरणे आणि प्रशासकीय माहिती",
   "ctgNGOsDescription": "गैर-सरकारी संस्था आणि समुदायिक सेवा",
   "ctgOthersDescription": "विविध सेवा आणि सामान्य माहिती",
+
+  "exploreMore": "अधिक एक्सप्लोर करा",
+  "searchPlaceholder": "ब्लॉग शोधा...",
+  "searchResults": "शोध परिणाम",
+  "searchingFor": "यासाठी शोधत आहे",
+  "searching": "शोधत आहे...",
+  "noResultsFound": "कोणते परिणाम सापडले नाहीत",
+  "searchTips": "वेगळे कीवर्ड वापरून पहा किंवा आमच्या श्रेणी पहा",
+  "searchResultsCount": "{{count}} परिणाम सापडले",
+  "backToHome": "मुख्यपृष्ठावर परत जा",
+
   "adminNavPublishedBlogs": "प्रकाशित ब्लॉग",
   "adminNavDraftBlogs": "ड्राफ्ट ब्लॉग",
   "adminNavNewBlog": "नवीन ब्लॉग",

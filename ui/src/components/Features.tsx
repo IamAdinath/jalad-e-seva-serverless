@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // Import the new dedicated CSS file
 import './Features.css';
@@ -35,6 +36,8 @@ const categoryThumbnails: Record<string, string> = {
 const Features: React.FC = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   
   // Get first 12 categories for features
   const featuresData: FeatureItem[] = CATEGORY_KEYS.slice(0, 12).map(categoryKey => ({
@@ -55,6 +58,32 @@ const Features: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [totalSlides]);
+
+  // Touch handlers for mobile swipe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -81,20 +110,36 @@ const Features: React.FC = () => {
             <div 
               className="carousel-track"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
             >
               {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                 <div key={slideIndex} className="carousel-slide">
                   <div className="features-grid">
                     {featuresData
                       .slice(slideIndex * cardsPerSlide, (slideIndex + 1) * cardsPerSlide)
-                      .map((feature, index) => (
-                        <div className="features-item" key={feature.categoryKey}>
-                          <div className="thumbnail">{feature.thumbnail}</div>
-                          <h4>{t(feature.title)}</h4>
-                          <div className="line-dec"></div>
-                          <p>{t(`${feature.categoryKey}Description`, `Explore ${t(feature.title)} related services and information`)}</p>
-                        </div>
-                      ))}
+                      .map((feature, index) => {
+                        // Extract category name from key (remove 'ctg' prefix)
+                        const categoryName = feature.categoryKey.replace('ctg', '').toLowerCase();
+                        return (
+                          <Link 
+                            to={`/category/${categoryName}`} 
+                            className="features-item-link" 
+                            key={feature.categoryKey}
+                          >
+                            <div className="features-item">
+                              <div className="thumbnail">{feature.thumbnail}</div>
+                              <h4>{t(feature.title)}</h4>
+                              <div className="line-dec"></div>
+                              <p>{t(`${feature.categoryKey}Description`, `Explore ${t(feature.title)} related services and information`)}</p>
+                              <div className="explore-btn">
+                                {t('exploreMore', 'Explore More')} →
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
                   </div>
                 </div>
               ))}

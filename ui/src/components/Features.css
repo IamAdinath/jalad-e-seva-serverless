@@ -61,6 +61,7 @@
   display: flex;
   transition: transform 0.5s ease-in-out;
   width: 100%;
+  touch-action: pan-y pinch-zoom;
 }
 
 .carousel-slide {
@@ -80,6 +81,13 @@
 /* ---------------------------------- */
 /* 2. Feature Card Styling            */
 /* ---------------------------------- */
+.features-item-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
 .features-item {
   background-color: #ffffff;
   border-radius: 12px;
@@ -88,10 +96,21 @@
   border: 1px solid var(--border-color);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
   transition: all 0.3s ease-in-out;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
 }
 
 /* The interactive hover effect */
 .features-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-color);
+}
+
+.features-item-link:hover .features-item {
   transform: translateY(-8px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   border-color: var(--primary-color);
@@ -141,6 +160,26 @@
   font-size: 1rem;
   line-height: 1.6;
   color: var(--text-light);
+  flex-grow: 1;
+}
+
+/* Explore button */
+.explore-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.features-item:hover .explore-btn {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  transform: translateX(5px);
 }
 
 /* ---------------------------------- */
@@ -341,6 +380,24 @@
   
   .features-carousel {
     padding: 0 10px;
+  }
+  
+  .explore-btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+}
+
+/* Ensure proper grid layout on different screen sizes */
+@media (min-width: 768px) and (max-width: 991px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

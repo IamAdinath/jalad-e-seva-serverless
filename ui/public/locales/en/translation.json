@@ -107,6 +107,16 @@
   "ctgNGOsDescription": "Non-governmental organizations and community services",
   "ctgOthersDescription": "Miscellaneous services and general information",
 
+  "exploreMore": "Explore More",
+  "searchPlaceholder": "Search blogs...",
+  "searchResults": "Search Results",
+  "searchingFor": "Searching for",
+  "searching": "Searching...",
+  "noResultsFound": "No results found",
+  "searchTips": "Try different keywords or browse our categories",
+  "searchResultsCount": "Found {{count}} result{{count === 1 ? '' : 's'}}",
+  "backToHome": "Back to Home",
+
   "adminNavPublishedBlogs": "Published Blogs",
   "adminNavDraftBlogs": "Draft Blogs", 
   "adminNavNewBlog": "New Blog",

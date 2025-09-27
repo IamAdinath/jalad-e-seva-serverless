@@ -11,6 +11,8 @@ const AdminHeader: React.FC = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { logout, user } = useAuth();
   const { showSuccess } = useToast();
   const navigate = useNavigate();
@@ -39,6 +41,27 @@ const AdminHeader: React.FC = () => {
     }
   };
 
+  // Search functionality
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsSearchOpen(false);
+    }
+  };
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      // Focus on search input when opened
+      setTimeout(() => {
+        const searchInput = document.querySelector('.admin-search-input') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 100);
+    }
+  };
+
   return (
     <header className={isSticky ? 'admin-header sticky' : 'admin-header'}>
       <div className="container">
@@ -49,12 +72,35 @@ const AdminHeader: React.FC = () => {
             <span className="logo-text">e-Seva Admin</span>
           </Link>
 
+          {/* SEARCH BAR */}
+          <div className={`admin-search-container ${isSearchOpen ? 'active' : ''}`}>
+            <form onSubmit={handleSearch} className="admin-search-form">
+              <input
+                type="text"
+                className="admin-search-input"
+                placeholder={t('searchPlaceholder', 'Search blogs...')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit" className="admin-search-submit-btn">
+                🔍
+              </button>
+            </form>
+          </div>
+
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><Link to="/admin/dashboard">{t('adminNavPublishedBlogs')}</Link></li>
             <li><Link to="/admin/drafts">{t('adminNavDraftBlogs')}</Link></li>
             <li><Link to="/admin/new-blog">{t('adminNavNewBlog')}</Link></li>
             <li><Link to="/admin/categories">{t('adminNavCategories')}</Link></li>
-            
+
+            {/* SEARCH BUTTON */}
+            <li className="nav-search">
+              <button className="admin-search-toggle-btn" onClick={toggleSearch} aria-label="Toggle search">
+                🔍
+              </button>
+            </li>
+
             <li className="nav-translate">
               <LanguageSwitcher />
             </li>
@@ -69,9 +115,9 @@ const AdminHeader: React.FC = () => {
           </ul>
 
           {/* HAMBURGER MENU BUTTON */}
-          <button 
-            className={isMenuOpen ? 'menu-toggle active' : 'menu-toggle'} 
-            onClick={toggleMenu} 
+          <button
+            className={isMenuOpen ? 'menu-toggle active' : 'menu-toggle'}
+            onClick={toggleMenu}
             aria-label="Toggle menu"
           >
             <span className="bar"></span>

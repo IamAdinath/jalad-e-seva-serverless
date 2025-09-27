@@ -30,4 +30,10 @@ export const apiEndpoints = {
   uploadToS3: `${baseUrl}/upload-to-s3`,
   getBlogsbyStatus: (status: string) => `${baseUrl}/blogs?status=${status}`,
   getBlogsbyCategory: (category: string) => `${baseUrl}/get-blogs-by-category?category=${category}`,
+  searchBlogs: (query: string, limit?: number) => {
+    const params = new URLSearchParams();
+    params.append('q', query);
+    if (limit) params.append('limit', limit.toString());
+    return `${baseUrl}/search-blogs?${params.toString()}`;
+  },
 };

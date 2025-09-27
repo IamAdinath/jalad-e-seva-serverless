@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import CreatePost from './pages/CreatePost' 
 import CategoryBlogs from './pages/CategoryBlogs';
 import AllBlogs from './pages/AllBlogs';
+import Search from './pages/Search';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Blog from './pages/Blog';
 import { ToastProvider, ToastContainer } from './components/Toast';
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/blogs" element={<AllBlogs />} />
                 <Route path="/blog/:id" element={<Blog />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/create-post" element={<CreatePost />} />
                 
                 {/* Admin Routes */}
@@ -58,7 +60,10 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                {/* All other paths are treated as categories */}
+                {/* Category routes */}
+                <Route path="/category/:category" element={<CategoryBlogs />} />
+                
+                {/* All other paths are treated as categories (for backward compatibility) */}
                 <Route path="/:category" element={<CategoryBlogs />} />
               </Routes>
             </Router>
