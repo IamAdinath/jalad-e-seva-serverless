@@ -43,6 +43,31 @@
   margin: 0 auto;
 }
 
+/* ---------------------------------- */
+/* 2. Carousel Container              */
+/* ---------------------------------- */
+.features-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.carousel-container {
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+}
+
 /* The grid container for the feature cards */
 .features-grid {
   display: grid;
@@ -72,21 +97,26 @@
   border-color: var(--primary-color);
 }
 
-/* The number circle */
-.features-item .number {
+/* The thumbnail */
+.features-item .thumbnail {
   margin: 0 auto 20px auto;
   width: 60px;
   height: 60px;
-  border-radius: 50%; /* Makes it a perfect circle */
+  border-radius: 50%;
   background-color: var(--secondary-color);
-  color: var(--text-color);
-  font-size: 1.5rem;
-  font-weight: 600;
-
-  /* Centering the number inside the circle */
+  font-size: 2rem;
+  
+  /* Centering the emoji inside the circle */
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  /* Add subtle animation */
+  transition: transform 0.3s ease-in-out;
+}
+
+.features-item:hover .thumbnail {
+  transform: scale(1.1);
 }
 
 /* The card title */
@@ -113,9 +143,72 @@
   color: var(--text-light);
 }
 
+/* ---------------------------------- */
+/* 3. Carousel Navigation             */
+/* ---------------------------------- */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn-prev {
+  left: -25px;
+}
+
+.carousel-btn-next {
+  right: -25px;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--border-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background-color: var(--primary-color);
+  transform: scale(1.2);
+}
+
+.carousel-dot:hover {
+  background-color: var(--secondary-color);
+}
+
 
 /* ---------------------------------- */
-/* 3. Responsive Grid Layout          */
+/* 4. Responsive Grid Layout          */
 /* ---------------------------------- */
 /* Small Mobile */
 @media (max-width: 480px) {
@@ -156,11 +249,25 @@
     box-sizing: border-box;
   }
 
-  .features-item .number {
+  .features-item .thumbnail {
     width: 50px;
     height: 50px;
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     margin-bottom: 15px;
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .carousel-btn-prev {
+    left: -20px;
+  }
+
+  .carousel-btn-next {
+    right: -20px;
   }
 
   .features-item h4 {
@@ -226,6 +333,17 @@
   }
 }
 
+/* Hide navigation buttons on small screens */
+@media (max-width: 767px) {
+  .carousel-btn {
+    display: none;
+  }
+  
+  .features-carousel {
+    padding: 0 10px;
+  }
+}
+
 /* Large Desktop */
 @media (min-width: 1200px) {
   .features-section {
@@ -252,11 +370,25 @@
     padding: 50px 35px;
   }
 
-  .features-item .number {
+  .features-item .thumbnail {
     width: 70px;
     height: 70px;
-    font-size: 1.6rem;
+    font-size: 2.2rem;
     margin-bottom: 25px;
+  }
+
+  .carousel-btn {
+    width: 55px;
+    height: 55px;
+    font-size: 1.6rem;
+  }
+
+  .carousel-btn-prev {
+    left: -27px;
+  }
+
+  .carousel-btn-next {
+    right: -27px;
   }
 
   .features-item h4 {
