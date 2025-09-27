@@ -32,9 +32,9 @@ const Footer: React.FC = () => {
           <div className="footer-links">
             <h4>{t('footerQuickLinks')}</h4>
             <ul>
-              <li><a href="/schemes">{t('navSchemes')}</a></li>
-              <li><a href="/jobs">{t('navJobs')}</a></li>
-              <li><a href="/students">{t('navStudents')}</a></li>
+              <li><a href="/schemes">{t('ctgSchemes')}</a></li>
+              <li><a href="/jobs">{t('ctgJobs')}</a></li>
+              <li><a href="/education">{t('ctgEducation')}</a></li>
               <li><a href="/#contact">{t('footerContact')}</a></li>
             </ul>
           </div>

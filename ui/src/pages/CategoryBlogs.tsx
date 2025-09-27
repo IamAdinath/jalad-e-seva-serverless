@@ -1,14 +1,17 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import BlogList from "../components/BlogList";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import CategoryBlogsMarquee from "../components/CategoryBlogsMarquee";
 import type { BlogPost } from "../components/utils/types";
 import { getBlogsbyCategory } from "../components/utils/apis";
 import { useToast } from "../components/Toast";
 
 const CategoryBlogs: React.FC = () => {
   const { category } = useParams<{ category: string }>();
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { showError, showSuccess, showInfo } = useToast();
@@ -55,6 +58,16 @@ const CategoryBlogs: React.FC = () => {
   return (
     <>
       <Header />
+      {category && (
+        <CategoryBlogsMarquee 
+          category={category}
+          maxItems={7}
+          daysThreshold={2}
+          fallbackMessage={t('marqueeStayTuned', { category: t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category })}
+          enableAutoRefresh={true}
+          refreshInterval={5 * 60 * 1000} // 5 minutes
+        />
+      )}
       <BlogList blogs={blogs} loading={loading} />
       <Footer />
     </>
