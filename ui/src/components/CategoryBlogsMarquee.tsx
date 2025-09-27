@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCategoryBlogMarquee } from '../hooks/useCategoryBlogMarquee';
 import type { BlogPost } from './utils/types';
 
@@ -31,6 +32,7 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
   refreshInterval = 5 * 60 * 1000, // 5 minutes default
   enableAutoRefresh = true
 }) => {
+  const { t } = useTranslation();
   const { blogs, loading, error, refresh, lastUpdated } = useCategoryBlogMarquee(category, daysThreshold, maxItems);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
@@ -107,7 +109,7 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
     if (loading && blogs.length === 0) {
       return [{ 
         id: 'loading', 
-        text: retryCount > 0 ? `Retrying... (${retryCount}/${maxRetries})` : `Loading latest ${category} updates...` 
+        text: retryCount > 0 ? `Retrying... (${retryCount}/${maxRetries})` : `Loading latest ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates...` 
       }];
     }
 
@@ -138,7 +140,7 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
 
       return [{ 
         id: 'error-final', 
-        text: `Unable to load ${category} updates. Please check your connection.` 
+        text: `Unable to load ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates. Please check your connection.` 
       }];
     }
 
@@ -147,7 +149,8 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
       if (fallbackMessage) {
         return [{ id: 'fallback', text: fallbackMessage }];
       }
-      return [{ id: 'no-updates', text: `No recent ${category} updates available` }];
+      const categoryName = t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category;
+      return [{ id: 'no-updates', text: t('marqueeNoRecentUpdates', { category: categoryName }) }];
     }
 
     // Reset retry count on successful load
@@ -179,19 +182,19 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
     <div 
       className={containerClasses}
       role="banner"
-      aria-label={`Latest ${category} updates and announcements`}
+      aria-label={`Latest ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates and announcements`}
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       {/* Screen reader announcement */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {loading ? `Loading ${category} updates` : 
-         error ? `Error loading ${category} updates, showing cached or fallback content` :
-         `${blogs.length} recent ${category} updates available`}
+        {loading ? `Loading ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates` : 
+         error ? `Error loading ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates, showing cached or fallback content` :
+         `${blogs.length} recent ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates available`}
       </div>
       
       <div className="updates-label">
-        <div>{category.toUpperCase()}</div>
+        <div>{(t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category).toUpperCase()}</div>
         {lastUpdated && (
           <div className="last-updated" aria-label={`Last updated at ${lastUpdated.toLocaleString()}`}>
             {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -203,7 +206,7 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
         <div 
           className="marquee-content"
           role="marquee"
-          aria-label={`Scrolling ${category} updates`}
+          aria-label={`Scrolling ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates`}
         >
           {marqueeContent.map((item, index) => (
             <span 
@@ -223,8 +226,8 @@ const CategoryBlogsMarquee: React.FC<CategoryBlogsMarqueeProps> = React.memo(({
           className="refresh-button"
           onClick={handleManualRefresh}
           disabled={loading}
-          aria-label={`Refresh ${category} updates manually`}
-          title={`Click to refresh ${category} updates`}
+          aria-label={`Refresh ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates manually`}
+          title={`Click to refresh ${t(`ctg${category.charAt(0).toUpperCase() + category.slice(1)}`) || category} updates`}
         >
           {loading ? '⟳' : '↻'}
         </button>
