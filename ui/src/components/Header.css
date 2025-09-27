@@ -44,6 +44,7 @@ body {
   border-bottom: 1px solid var(--border-color);
   z-index: 1000;
   transition: all 0.3s ease;
+  overflow-x: hidden;
 }
 
 .header.sticky {
@@ -56,6 +57,8 @@ body {
   justify-content: space-between;
   align-items: center;
   height: 100%;
+  width: 100%;
+  min-height: 60px;
 }
 
 
@@ -144,7 +147,33 @@ body {
 
 
 /* ---------------------------------- */
-/* 5. Desktop Navigation              */
+/* 5. Tablet Navigation               */
+/* ---------------------------------- */
+@media (min-width: 768px) and (max-width: 991px) {
+  .nav-links {
+    padding: 2rem 1rem;
+  }
+  
+  .nav-links li {
+    margin: 15px 0;
+  }
+  
+  .nav-links a {
+    font-size: 1.4rem;
+    padding: 0.75rem;
+  }
+  
+  .logo-text {
+    font-size: 1.4rem;
+  }
+  
+  .logo-img {
+    height: 38px;
+  }
+}
+
+/* ---------------------------------- */
+/* 6. Desktop Navigation              */
 /* ---------------------------------- */
 @media (min-width: 992px) {
   .menu-toggle {
@@ -158,6 +187,7 @@ body {
     background-color: transparent;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-end;
   }
   .nav-links li {
     margin: 0 0 0 32px;
@@ -203,5 +233,211 @@ body {
   }
   .nav-cta a::after {
     display: none;
+  }
+}
+
+/* ---------------------------------- */
+/* 7. Large Desktop Navigation        */
+/* ---------------------------------- */
+@media (min-width: 1200px) {
+  .nav-links li {
+    margin: 0 0 0 40px;
+  }
+  
+  .nav-links a {
+    font-size: 1.1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.7rem;
+  }
+  
+  .logo-img {
+    height: 45px;
+  }
+}
+
+/* ---------------------------------- */
+/* 8. Small Mobile Improvements       */
+/* ---------------------------------- */
+@media (max-width: 480px) {
+  :root {
+    --header-height: 55px;
+  }
+
+  body {
+    padding-top: var(--header-height);
+  }
+
+  .container {
+    padding: 0 0.25rem;
+    max-width: 100%;
+  }
+
+  .navbar {
+    min-height: 45px;
+    gap: 0.25rem;
+  }
+  
+  .logo {
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 50px); /* Reserve space for menu button */
+  }
+
+  .logo-img {
+    height: 24px;
+    margin-right: 0.2rem;
+    flex-shrink: 0;
+  }
+  
+  .logo-text {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .menu-toggle {
+    padding: 0.2rem;
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .menu-toggle .bar {
+    width: 18px;
+    height: 2px;
+    margin: 2px 0;
+  }
+  
+  .nav-links a {
+    font-size: 1.3rem;
+    margin: 14px 0;
+  }
+}
+
+/* ---------------------------------- */
+/* 9. Extra Small Mobile              */
+/* ---------------------------------- */
+@media (max-width: 360px) {
+  :root {
+    --header-height: 50px;
+  }
+
+  .container {
+    padding: 0 0.15rem;
+    max-width: 100%;
+  }
+
+  .navbar {
+    min-height: 40px;
+    gap: 0.15rem;
+  }
+
+  .logo {
+    max-width: calc(100% - 45px);
+  }
+
+  .logo-img {
+    height: 20px;
+    margin-right: 0.15rem;
+  }
+  
+  .logo-text {
+    font-size: 0.8rem;
+  }
+
+  .menu-toggle {
+    padding: 0.15rem;
+    margin-left: 0.15rem;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .menu-toggle .bar {
+    width: 16px;
+    height: 2px;
+    margin: 1.5px 0;
+  }
+  
+  .nav-links a {
+    font-size: 1.2rem;
+    margin: 12px 0;
+  }
+}
+
+/* ---------------------------------- */
+/* 10. Landscape Mobile               */
+/* ---------------------------------- */
+@media (max-width: 768px) and (orientation: landscape) {
+  .nav-links {
+    padding: 1rem;
+    justify-content: flex-start;
+    padding-top: 1rem;
+  }
+  
+  .nav-links li {
+    margin: 8px 0;
+  }
+  
+  .nav-links a {
+    font-size: 1.4rem;
+    padding: 0.5rem;
+  }
+}
+
+/* ---------------------------------- */
+/* 11. Very Small Screens Fix         */
+/* ---------------------------------- */
+@media (max-width: 320px) {
+  :root {
+    --header-height: 48px;
+  }
+
+  .container {
+    padding: 0 0.1rem;
+    max-width: 100%;
+  }
+
+  .navbar {
+    min-height: 38px;
+    gap: 0.1rem;
+  }
+
+  .logo {
+    max-width: calc(100% - 40px);
+  }
+
+  .logo-img {
+    height: 18px;
+    margin-right: 0.1rem;
+  }
+  
+  .logo-text {
+    font-size: 0.75rem;
+  }
+
+  .menu-toggle {
+    padding: 0.1rem;
+    margin-left: 0.1rem;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .menu-toggle .bar {
+    width: 14px;
+    height: 1.5px;
+    margin: 1.5px 0;
+  }
+  
+  .nav-links a {
+    font-size: 1.1rem;
+    margin: 10px 0;
   }
 }
