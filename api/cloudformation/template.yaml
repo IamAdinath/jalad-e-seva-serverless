@@ -368,6 +368,35 @@ Resources:
           BLOGS_TABLE: !Ref BlogsTable
           BLOG_IMAGES_BUCKET: !Ref MediaBucket
 
+  SearchBlogsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ProjectName}-${Env}-search-blogs
+      Handler: blogs.search.lambda_handler
+      Timeout: 60
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+      Events:
+        searchBlogsGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /search-blogs
+            Method: GET
+        searchBlogsOptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref jaladAPI
+            Path: /search-blogs
+            Method: OPTIONS
+      Environment:
+        Variables:
+          BLOGS_TABLE: !Ref BlogsTable
+          BLOG_IMAGES_BUCKET: !Ref MediaBucket
+
 
   UploadToS3Lambda:
     Type: AWS::Serverless::Function
