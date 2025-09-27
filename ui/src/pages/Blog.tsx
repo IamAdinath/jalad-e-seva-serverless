@@ -8,6 +8,7 @@ import Header from '../components/Header';
 import BlogReader from '../components/ReadBlog';
 import Footer from '../components/Footer';
 import { useToast } from '../components/Toast';
+import "../assets/css/page-layouts-responsive.css";
 
 const Blog = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +58,7 @@ const Blog = () => {
     return (
       <>
         <Header />
-        <div className="reader-status-container">
+        <div className="blog-error-container">
             <h2>Error Fetching Blog</h2>
             <p>{error}</p>
         </div>

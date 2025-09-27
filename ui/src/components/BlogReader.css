@@ -10,6 +10,20 @@
   padding: 0 20px;
 }
 
+@media (max-width: 768px) {
+  .blog-reader-container {
+    margin: 40px auto;
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-reader-container {
+    margin: 20px auto;
+    padding: 0 10px;
+  }
+}
+
 /* --- Header Styling (Title & Metadata) --- */
 .blog-header {
   text-align: center;
@@ -22,6 +36,21 @@
   line-height: 1.2;
   color: var(--text-color, #212529);
   margin: 0 0 20px 0;
+}
+
+@media (max-width: 768px) {
+  .blog-title {
+    font-size: 2.2rem;
+    margin: 0 0 15px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-title {
+    font-size: 1.8rem;
+    line-height: 1.3;
+    margin: 0 0 12px 0;
+  }
 }
 
 .blog-meta {
@@ -52,6 +81,20 @@
   font-size: 1.1rem; /* A comfortable reading size */
   line-height: 1.7;  /* Generous line spacing for readability */
   color: var(--text-color-secondary, #343a40);
+}
+
+@media (max-width: 768px) {
+  .blog-content {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
 }
 
 /* Spacing between paragraphs */

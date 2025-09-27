@@ -1,0 +1,201 @@
+/*
+  Home.css
+  Specific responsive fixes for the Home page
+*/
+
+/* Home page container */
+.home-page-container {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.home-main-content {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Override any Bootstrap container issues */
+.home-page-container .container,
+.home-main-content .container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+  .home-page-container .container,
+  .home-main-content .container {
+    padding: 0 0.75rem !important;
+    max-width: 100vw !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-page-container .container,
+  .home-main-content .container {
+    padding: 0 0.5rem !important;
+    max-width: 100vw !important;
+  }
+}
+
+/* Ensure all sections fit within viewport */
+.home-page-container section,
+.home-main-content section {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Fix for any wide elements */
+.home-page-container *,
+.home-main-content * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Specific fixes for Banner */
+.home-page-container .hero-banner,
+.home-main-content .hero-banner {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.home-page-container .banner-content,
+.home-main-content .banner-content {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Specific fixes for Features */
+.home-page-container .features-section,
+.home-main-content .features-section {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.home-page-container .features-grid,
+.home-main-content .features-grid {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Specific fixes for BlogsMarquee */
+.home-page-container .updates-marquee-container,
+.home-main-content .updates-marquee-container {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Mobile portrait specific fixes */
+@media (max-width: 480px) and (orientation: portrait) {
+  .home-page-container,
+  .home-main-content {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .home-page-container .container,
+  .home-main-content .container {
+    padding: 0 0.5rem !important;
+    max-width: 100vw !important;
+  }
+
+  .home-page-container .banner-content,
+  .home-main-content .banner-content {
+    padding: 0 0.5rem !important;
+  }
+
+  .home-page-container .hero-title,
+  .home-main-content .hero-title {
+    font-size: 1.6rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .home-page-container .hero-subtitle,
+  .home-main-content .hero-subtitle {
+    font-size: 0.95rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .home-page-container .cta-button,
+  .home-main-content .cta-button {
+    width: 100% !important;
+    max-width: 260px !important;
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Extra small mobile fixes */
+@media (max-width: 360px) {
+  .home-page-container .container,
+  .home-main-content .container {
+    padding: 0 0.25rem !important;
+  }
+
+  .home-page-container .banner-content,
+  .home-main-content .banner-content {
+    padding: 0 0.25rem !important;
+  }
+
+  .home-page-container .hero-title,
+  .home-main-content .hero-title {
+    font-size: 1.4rem !important;
+  }
+
+  .home-page-container .hero-subtitle,
+  .home-main-content .hero-subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  .home-page-container .cta-button,
+  .home-main-content .cta-button {
+    max-width: 240px !important;
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Very small mobile fixes */
+@media (max-width: 320px) {
+  .home-page-container .container,
+  .home-main-content .container {
+    padding: 0 0.2rem !important;
+  }
+
+  .home-page-container .banner-content,
+  .home-main-content .banner-content {
+    padding: 0 0.2rem !important;
+  }
+
+  .home-page-container .hero-title,
+  .home-main-content .hero-title {
+    font-size: 1.2rem !important;
+  }
+
+  .home-page-container .hero-subtitle,
+  .home-main-content .hero-subtitle {
+    font-size: 0.85rem !important;
+  }
+
+  .home-page-container .cta-button,
+  .home-main-content .cta-button {
+    max-width: 220px !important;
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+  }
+}

@@ -120,3 +120,145 @@
 .post-meta .separator {
   margin: 0 5px;
 }
+
+/* --- Responsive Design --- */
+@media (max-width: 480px) {
+  .blog-list-section {
+    padding: 60px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 40px;
+    padding: 0 1rem;
+  }
+
+  .section-heading h2 {
+    font-size: 1.8rem;
+  }
+
+  .section-heading p {
+    font-size: 1rem;
+  }
+
+  .blog-grid {
+    gap: 30px;
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  .card-content {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .card-summary {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .card-footer {
+    margin-top: 20px;
+    padding-top: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .author-avatar {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+  }
+
+  .author-name {
+    font-size: 0.85rem;
+  }
+
+  .post-meta {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .blog-list-section {
+    padding: 70px 0;
+  }
+
+  .section-heading {
+    padding: 0 1.5rem;
+  }
+
+  .section-heading h2 {
+    font-size: 2rem;
+  }
+
+  .blog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 35px;
+    padding: 0 1.5rem;
+  }
+
+  .card-content {
+    padding: 22px;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .blog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .blog-list-section {
+    padding: 100px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 80px;
+  }
+
+  .section-heading h2 {
+    font-size: 2.5rem;
+  }
+
+  .section-heading p {
+    font-size: 1.2rem;
+  }
+
+  .blog-grid {
+    gap: 50px;
+  }
+
+  .card-content {
+    padding: 30px;
+  }
+
+  .card-title {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .card-summary {
+    font-size: 1.05rem;
+  }
+
+  .card-footer {
+    margin-top: 30px;
+    padding-top: 18px;
+  }
+}
