@@ -137,3 +137,43 @@ export async function getBlogs(
     return { error: "Failed to fetch blogs" } as APIErrorResponse;
   }
 }
+
+export async function getRecentBlogs(
+  daysThreshold: number = 2,
+  limit: number = 7
+): Promise<BlogPost[] | APIErrorResponse> {
+  try {
+    // Fetch published blogs with a reasonable limit to filter client-side
+    const response = await getBlogs(50, undefined, "published");
+    
+    if ('error' in response) {
+      return response;
+    }
+
+    // Calculate cutoff date
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
+
+    // Filter and sort blogs by date
+    const recentBlogs = response.blogs
+      .filter(blog => {
+        // Use publishedAt, startDate, or endDate for date comparison
+        const blogDate = new Date(blog.publishedAt || blog.startDate || blog.endDate || '');
+        return !isNaN(blogDate.getTime()) && blogDate >= cutoffDate;
+      })
+      .sort((a, b) => {
+        // Sort by newest first
+        const dateA = new Date(a.publishedAt || a.startDate || a.endDate || '');
+        const dateB = new Date(b.publishedAt || b.startDate || b.endDate || '');
+        return dateB.getTime() - dateA.getTime();
+      })
+      .slice(0, limit);
+
+    console.log(`Found ${recentBlogs.length} recent blogs within ${daysThreshold} days`);
+    return recentBlogs;
+
+  } catch (error) {
+    console.error("Error fetching recent blogs:", error);
+    return { error: "Failed to fetch recent blogs", status: 'error' } as APIErrorResponse;
+  }
+}

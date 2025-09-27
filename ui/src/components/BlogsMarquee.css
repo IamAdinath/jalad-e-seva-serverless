@@ -1,0 +1,175 @@
+/*
+  BlogsMarquee.css
+  Enhanced styles for the blog marquee with accessibility and responsive design
+*/
+
+/* Accessibility: Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-content {
+    animation: none !important;
+  }
+  
+  .marquee-content {
+    transform: none !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .update-item {
+    margin-right: 20px !important;
+  }
+}
+
+/* Enhanced marquee container for better accessibility */
+.updates-marquee-container {
+  position: relative;
+}
+
+/* Pause/resume functionality */
+.updates-marquee-container:hover .marquee-content,
+.updates-marquee-container:focus-within .marquee-content {
+  animation-play-state: paused;
+}
+
+/* Keyboard focus styles */
+.updates-marquee-container:focus-within {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .updates-label {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+  }
+  
+  .updates-marquee-container {
+    padding: 8px 0;
+  }
+  
+  .update-item {
+    font-size: 0.9rem;
+    margin-right: 40px;
+  }
+  
+  .update-item::after {
+    margin-left: 40px;
+  }
+  
+  /* Slower animation on mobile for better readability */
+  .marquee-content {
+    animation-duration: 10s;
+  }
+}
+
+@media (max-width: 480px) {
+  .updates-label {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .update-item {
+    font-size: 0.85rem;
+    margin-right: 30px;
+  }
+  
+  .update-item::after {
+    margin-left: 30px;
+  }
+  
+  /* Even slower on very small screens */
+  .marquee-content {
+    animation-duration: 12s;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .updates-marquee-container {
+    border: 2px solid;
+  }
+  
+  .updates-label {
+    border-right: 2px solid;
+  }
+}
+
+/* Loading state styles */
+.marquee-loading {
+  opacity: 0.7;
+}
+
+.marquee-loading .update-item {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Error state styles */
+.marquee-error .update-item {
+  color: #d32f2f;
+}
+
+/* Manual refresh button styles */
+.refresh-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s ease;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background: #005a4f;
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refresh-button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Last updated timestamp styles */
+.last-updated {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .last-updated {
+    font-size: 0.65rem;
+  }
+}
