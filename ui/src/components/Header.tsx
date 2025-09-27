@@ -13,7 +13,6 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // This function adds the .sticky class to the header when you scroll
   useEffect(() => {
@@ -35,23 +34,12 @@ const Header: React.FC = () => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
-      setIsSearchOpen(false);
-    }
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (!isSearchOpen) {
-      // Focus on search input when opened
-      setTimeout(() => {
-        const searchInput = document.querySelector('.search-input') as HTMLInputElement;
-        if (searchInput) searchInput.focus();
-      }, 100);
+      setIsMenuOpen(false); // Close mobile menu after search
     }
   };
 
   return (
-    // The class will be "header" or "header sticky"
+    // The class will be "header" or "header sticky" with optional "search-open"
     <header className={isSticky ? 'header sticky' : 'header'}>
       <div className="container">
         <nav className="navbar">
@@ -60,22 +48,6 @@ const Header: React.FC = () => {
             <img src={logo} alt="e-Seva Logo" className="logo-img" />
             <span className="logo-text">e-Seva</span>
           </Link>
-
-          {/* SEARCH BAR */}
-          <div className={`search-container ${isSearchOpen ? 'active' : ''}`}>
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                className="search-input"
-                placeholder={t('searchPlaceholder', 'Search blogs...')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className="search-submit-btn">
-                🔍
-              </button>
-            </form>
-          </div>
 
           {/* NAVIGATION LINKS */}
           {/* The class will be "nav-links" or "nav-links active" */}
@@ -87,11 +59,20 @@ const Header: React.FC = () => {
             <li><Link to="/Education">{t('ctgEducation')}</Link></li>
             <li><Link to="/Agriculture">{t('ctgAgriculture')}</Link></li>
             
-            {/* SEARCH BUTTON */}
-            <li className="nav-search">
-              <button className="search-toggle-btn" onClick={toggleSearch} aria-label="Toggle search">
-                🔍
-              </button>
+            {/* INTEGRATED SEARCH BAR */}
+            <li className="nav-search-container">
+              <form onSubmit={handleSearch} className="nav-search-form">
+                <input
+                  type="text"
+                  className="nav-search-input"
+                  placeholder={t('searchPlaceholder', 'Search What you looking for')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button type="submit" className="nav-search-btn">
+                  🔍
+                </button>
+              </form>
             </li>
             
             {/* ADD THE LANGUAGE SWITCHER HERE */}

@@ -12,7 +12,6 @@ const AdminHeader: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { logout, user } = useAuth();
   const { showSuccess } = useToast();
   const navigate = useNavigate();
@@ -47,18 +46,7 @@ const AdminHeader: React.FC = () => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
-      setIsSearchOpen(false);
-    }
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (!isSearchOpen) {
-      // Focus on search input when opened
-      setTimeout(() => {
-        const searchInput = document.querySelector('.admin-search-input') as HTMLInputElement;
-        if (searchInput) searchInput.focus();
-      }, 100);
+      setIsMenuOpen(false); // Close mobile menu after search
     }
   };
 
@@ -72,21 +60,7 @@ const AdminHeader: React.FC = () => {
             <span className="logo-text">e-Seva Admin</span>
           </Link>
 
-          {/* SEARCH BAR */}
-          <div className={`admin-search-container ${isSearchOpen ? 'active' : ''}`}>
-            <form onSubmit={handleSearch} className="admin-search-form">
-              <input
-                type="text"
-                className="admin-search-input"
-                placeholder={t('searchPlaceholder', 'Search blogs...')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className="admin-search-submit-btn">
-                🔍
-              </button>
-            </form>
-          </div>
+
 
           <ul className={isMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><Link to="/admin/dashboard">{t('adminNavPublishedBlogs')}</Link></li>
@@ -94,11 +68,20 @@ const AdminHeader: React.FC = () => {
             <li><Link to="/admin/new-blog">{t('adminNavNewBlog')}</Link></li>
             <li><Link to="/admin/categories">{t('adminNavCategories')}</Link></li>
 
-            {/* SEARCH BUTTON */}
-            <li className="nav-search">
-              <button className="admin-search-toggle-btn" onClick={toggleSearch} aria-label="Toggle search">
-                🔍
-              </button>
+            {/* INTEGRATED SEARCH BAR */}
+            <li className="nav-search-container">
+              <form onSubmit={handleSearch} className="nav-search-form">
+                <input
+                  type="text"
+                  className="nav-search-input"
+                  placeholder={t('searchPlaceholder', 'Search What you looking for')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button type="submit" className="nav-search-btn">
+                  🔍
+                </button>
+              </form>
             </li>
 
             <li className="nav-translate">

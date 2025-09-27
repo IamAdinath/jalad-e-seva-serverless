@@ -119,7 +119,7 @@ const Features: React.FC = () => {
                   <div className="features-grid">
                     {featuresData
                       .slice(slideIndex * cardsPerSlide, (slideIndex + 1) * cardsPerSlide)
-                      .map((feature, index) => {
+                      .map((feature) => {
                         // Extract category name from key (remove 'ctg' prefix)
                         const categoryName = feature.categoryKey.replace('ctg', '').toLowerCase();
                         return (
