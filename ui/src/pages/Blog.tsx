@@ -7,7 +7,9 @@ import type { BlogPost } from '../components/utils/types';
 import Header from '../components/Header';
 import BlogReader from '../components/ReadBlog';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { useToast } from '../components/Toast';
+import { CONTACT_CONFIG } from '../config/constants';
 import "../assets/css/page-layouts-responsive.css";
 
 const Blog = () => {
@@ -77,6 +79,13 @@ const Blog = () => {
       */}
       <BlogReader blog={blog} loading={loading} />
       <Footer />
+      {/* WhatsApp floating button - only show when blog is loaded */}
+      {blog && !loading && (
+        <WhatsAppButton 
+          phoneNumber={CONTACT_CONFIG.WHATSAPP_NUMBER}
+          message={CONTACT_CONFIG.WHATSAPP_DEFAULT_MESSAGE}
+        />
+      )}
     </>
   );
 };

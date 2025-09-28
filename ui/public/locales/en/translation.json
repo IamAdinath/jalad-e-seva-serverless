@@ -253,5 +253,8 @@
   "messageBlogImageInvalid": "Invalid image. Please use JPEG, PNG, or GIF format.",
   
   "marqueeStayTuned": "Stay tuned for the latest updates",
-  "marqueeNoRecentUpdates": "No recent updates available"
+  "marqueeNoRecentUpdates": "No recent updates available",
+  
+  "whatsappShareTitle": "Reach out for more information on WhatsApp",
+  "whatsappShareMessage": "Hello! I want to know about this:"
 }
