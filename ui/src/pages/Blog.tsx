@@ -33,8 +33,8 @@ const Blog = () => {
 
       setLoading(true);
       setError(null); // Reset previous errors
-      const fetchedBlog = await getBlogbyId(id); 
-      
+      const fetchedBlog = await getBlogbyId(id);
+
       // --- THIS IS THE CRITICAL FIX ---
       // We now check the shape of the response to see if it's an error.
       // This is called a "type guard".
@@ -48,7 +48,7 @@ const Blog = () => {
         setBlog(fetchedBlog);
         showSuccess('Blog loaded successfully');
       }
-      
+
       setLoading(false);
     };
 
@@ -61,8 +61,8 @@ const Blog = () => {
       <>
         <Header />
         <div className="blog-error-container">
-            <h2>Error Fetching Blog</h2>
-            <p>{error}</p>
+          <h2>Error Fetching Blog</h2>
+          <p>{error}</p>
         </div>
         <Footer />
       </>
@@ -81,9 +81,8 @@ const Blog = () => {
       <Footer />
       {/* WhatsApp floating button - only show when blog is loaded */}
       {blog && !loading && (
-        <WhatsAppButton 
+        <WhatsAppButton
           phoneNumber={CONTACT_CONFIG.WHATSAPP_NUMBER}
-          message={CONTACT_CONFIG.WHATSAPP_DEFAULT_MESSAGE}
         />
       )}
     </>
